@@ -1,0 +1,49 @@
+{
+  "qualified_on": "2026-11-14",
+  "hermes_version": "0.22.2",
+  "hardware": {
+    "cpu_cores": 4,
+    "ram_gib": 7.6
+  },
+  "isolated_e2e": {
+    "run": "rh-e2e-c51c1807741f",
+    "passed": true,
+    "peak": {
+      "api": 10,
+      "browser": 2,
+      "managed_browsers": 2
+    },
+    "api_requests": 10,
+    "real_browser_jobs": 4,
+    "remaining_leases": {
+      "agents": [],
+      "api": [],
+      "browser": []
+    },
+    "remaining_browser_daemons": 0,
+    "uses_real_model_provider": false
+  },
+  "watchdog_e2e": {
+    "passed": true,
+    "manual_stop_preserved": true,
+    "process_replaced": true
+  },
+  "live_canary": {
+    "run_id": "run_9664ddaf88ed49eab02694273dcd37a5",
+    "qualification": {
+      "completed_children": 10,
+      "verified_browser_titles": 4,
+      "passed": true,
+      "real_provider": true
+    },
+    "search_tasks": 6,
+    "browser_tasks": 4,
+    "batch_duration_seconds": 39.47,
+    "sampled_peak": {
+      "agents": 4,
+      "api": 2,
+      "browser": 2
+    },
+    "sampler_started_late": true
+  }
+}

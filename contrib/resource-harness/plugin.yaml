@@ -1,0 +1,7 @@
+name: resource-harness
+version: 0.1.0
+description: Shared API admission and bounded browser sessions for a small Hermes host.
+author: thapecroth
+requires_hermes: ">=0.22.2"
+provides_hooks:
+  - on_session_end
