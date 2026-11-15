@@ -15,5 +15,27 @@
   "completed_children": 4,
   "failed_children": 0,
   "first_research_action": "delegate_task",
-  "passed": true
+  "passed": true,
+  "final_synthesis_received": true,
+  "final_official_doc_links": 4,
+  "end_to_end_passed": true,
+  "delivery": "API persists async completion without a wake turn; consumer continued the same session via /api/sessions/{id}/chat to request synthesis",
+  "updated_plugin_e2e": {
+    "run": "rh-e2e-0f381630f927",
+    "passed": true,
+    "peak": {
+      "api": 10,
+      "browser": 2,
+      "managed_browsers": 2
+    },
+    "api_requests": 10,
+    "real_browser_jobs": 4,
+    "remaining_leases": {
+      "agents": [],
+      "api": [],
+      "browser": []
+    },
+    "remaining_browser_daemons": 0,
+    "uses_real_model_provider": false
+  }
 }

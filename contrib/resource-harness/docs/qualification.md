@@ -68,6 +68,15 @@ required skill, then made `delegate_task` its first research action with all fou
 in one batch. Durable completion reported four completed children and no failed children.
 See the [sanitized behavioral receipt](search-first-qualification-20261114.json).
 
+The final-answer check continued the same API session through its native `/chat` route
+and received a synthesis with four official documentation links. This continuation is
+explicit: the API adapter persists asynchronous delegation results without automatically
+starting a wake turn; its consumer owns that next turn. No Telegram test message was sent.
+
+The real-Hermes/Chromium E2E was rerun after the prompt update: ten HTTP requests overlapped,
+four real browser jobs completed with peak browser owners and managed browsers two, and
+all leases and harness daemons were gone afterward.
+
 This checks one real routing decision; it is not a benchmark claiming a fixed latency
 improvement. Existing conversations retain their frozen prompts and need `/new` to adopt
 the updated policy.
