@@ -64,9 +64,13 @@ async def main():
         model_tools.discover_builtin_tools()
         discover_plugins()
         config = read_raw_config()
-        model = _resolve_gateway_model(config)
-        runtime_kwargs = _resolve_runtime_agent_kwargs()
-        source = Path('/home/pi/.hermes/plugins/resource-harness')
+        if 'PROFILE_RUNTIME' in globals():
+            model, runtime_kwargs = PROFILE_RUNTIME
+        else:
+            model = _resolve_gateway_model(config)
+            runtime_kwargs = _resolve_runtime_agent_kwargs()
+        from hermes_constants import get_hermes_home
+        source = Path(os.environ.get('HERMES_PROFILE_PLUGIN', str(get_hermes_home() / 'plugins/resource-harness')))
         spec = importlib.util.spec_from_file_location('codon_profile_harness', source / '__init__.py',
                                                     submodule_search_locations=[str(source)])
         module = importlib.util.module_from_spec(spec)

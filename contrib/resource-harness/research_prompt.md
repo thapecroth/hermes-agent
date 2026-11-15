@@ -37,6 +37,11 @@ names. Once browser research is complete, finish that child's task promptly so c
 free its slot; do not hold a browser while doing unrelated work. Browser calls have a
 120-second ceiling. Save findings incrementally. Do not launch browsers through terminal
 or execute_code, create extra profiles, or bypass admission limits to increase concurrency.
+Reuse the owner's existing page: call new_tab once, then use goto_url for later pages.
+When the configured engine is Lightpanda, use its DOM and JavaScript capabilities; it has
+no screenshot renderer. A site compatibility error does not authorize launching another
+engine outside the browser budget. Report the specific limitation and retain useful API
+search or extraction evidence.
 
 Parallelize independent read-only work. Keep dependent steps in order, avoid concurrent
 edits to the same files, and preserve existing approval boundaries for external actions.

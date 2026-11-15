@@ -30,6 +30,8 @@ class Harness:
 
     def retain(self, kind, owner, cancel=None):
         with self.owner_lock(owner):
+            if cancel and cancel():
+                raise TimeoutError("Resource admission cancelled")
             with self.mutex:
                 existing = self.owners.get(owner, {}).get(kind)
             if existing:
@@ -93,19 +95,51 @@ def cleanup_browser(name, task_id="default"):
     from tools.browser_use_cli import _backend_cache_key, _sidecar_daemon_name
     from tools.browser_tool_lifecycle import cleanup_browser as cleanup_engine
     from tools.browser_supervisor import SUPERVISOR_REGISTRY
+    from .browser_cleanup import capture_processes, finish_cleanup, forget_verified
 
-    SUPERVISOR_REGISTRY.stop(task_id or "default")
+    capture_error = None
+    try:
+        processes = capture_processes(name)
+    except Exception as exc:
+        # Broken metadata must not prevent the actual teardown. Retain the slot
+        # afterward when independent verification was unavailable.
+        processes, capture_error = [], exc
+    errors = [capture_error] if capture_error is not None else []
+    try:
+        SUPERVISOR_REGISTRY.stop(task_id or "default")
+    except Exception as exc:
+        errors.append(exc)
     for daemon in (name, _sidecar_daemon_name(name)):
-        if daemon_alive(daemon):
-            restart_daemon(daemon, require_clean=True)
+        try:
             if daemon_alive(daemon):
-                raise RuntimeError("browser harness daemon survived cleanup")
-    cleanup_engine(_backend_cache_key(None, name))
-    cleanup_engine(_backend_cache_key(None, name, True))
+                restart_daemon(daemon, require_clean=True)
+                if daemon_alive(daemon):
+                    raise RuntimeError("browser harness daemon survived cleanup")
+        except Exception as exc:
+            errors.append(exc)
+    for key in (_backend_cache_key(None, name), _backend_cache_key(None, name, True)):
+        try:
+            cleanup_engine(key)
+        except Exception as exc:
+            errors.append(exc)
+    try:
+        finish_cleanup(processes)
+    except Exception as exc:
+        errors.append(exc)
+    if errors:
+        raise RuntimeError("Browser teardown or independent verification failed: " +
+                           "; ".join(str(error) for error in errors)) from errors[0]
+    forget_verified(name)
 
 
 def register(ctx):
     from hermes_constants import get_hermes_home
+
+    # Install before manager bootstrap can create workers. Baseline qualification
+    # disables this in its isolated profile before plugin discovery.
+    if ctx.get_config("locale_singleflight", True):
+        from .locale_cache import install_locale_singleflight
+        install_locale_singleflight()
 
     harnesses = {}
     mutex = threading.Lock()
@@ -162,6 +196,9 @@ def register(ctx):
         if not owner:
             return tool_error("Browser admission requires a session or task identity")
         try:
+            from .browser_cleanup import shared_endpoint_configured
+            if shared_endpoint_configured():
+                return tool_error('Resource harness requires an isolated browser per owner; disable browser.use_real_profile and clear browser.cdp_url, BU_CDP/BROWSER_CDP overrides and AGENT_BROWSER_PROFILE')
             h = current()
             h.retain("browser", owner, is_interrupted)
         except Exception as exc:
@@ -176,7 +213,22 @@ def register(ctx):
                 routed["timeout_s"] = min(h.browser_timeout, max(10, int(requested)))
             except (TypeError, ValueError):
                 routed["timeout_s"] = h.browser_timeout
-            result = next_call(routed)
+            from .browser_cleanup import capture_processes
+            try:
+                capture_processes(routed['session'])
+            except Exception:
+                h.release(owner, lambda name: cleanup_browser(name, task_id))
+                return tool_error('Browser process tracking unavailable; recovery is required')
+            try:
+                result = next_call(routed)
+            except BaseException:
+                h.release(owner, lambda name: cleanup_browser(name, task_id))
+                raise
+            try:
+                capture_processes(routed['session'])
+            except Exception:
+                h.release(owner, lambda name: cleanup_browser(name, task_id))
+                return tool_error('Browser process tracking failed; recovery is required')
             # A timeout/error must not leave the engine running or retain a poisoned browser.
             try:
                 decoded = json.loads(result) if isinstance(result, str) else result

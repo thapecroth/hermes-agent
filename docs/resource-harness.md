@@ -14,3 +14,4 @@ gathering immediately and delegates independent research in parallel within thes
 - [Original sanitized qualification receipt](../contrib/resource-harness/docs/qualification-20261114.json)
 - [Always-available Telegram manager and automatic resource recovery](../contrib/resource-harness/docs/telegram-manager.md)
 - [Manager, browser and recovery qualification receipt](../contrib/resource-harness/docs/manager-qualification-20261114.json)
+- [Local Lightpanda installation, session lifecycle and performance measurements](browser-performance.md)

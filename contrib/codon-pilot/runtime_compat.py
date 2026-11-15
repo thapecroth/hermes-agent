@@ -1,33 +1,22 @@
-"""Opt-in compatibility fixes for the isolated CPython-in-Codon launcher.
-
-Install before plugin discovery or worker creation. The shared lock prevents
-duplicate cold YAML parsing and prevents an old build publishing after a reset.
-This module does not replace the YAML parser or change catalog layering.
-"""
-from functools import wraps
+"""Compatibility import for the locale fix, now owned by the production plugin."""
+import importlib.util
+from pathlib import Path
 import threading
+
+_ADAPTER = None
+_LOAD_LOCK = threading.Lock()
 
 
 def install_locale_singleflight(module=None):
-    if module is None:
-        from agent import i18n as module
-    if getattr(module, '_codon_locale_singleflight', False):
-        return False
-    lock = threading.RLock()
-
-    def serialize(original):
-        @wraps(original)
-        def locked(*args, **kwargs):
-            with lock:
-                return original(*args, **kwargs)
-        return locked
-
-    # supported_languages also publishes a cached view that reset invalidates.
-    for name in ('_load_catalog', 'supported_languages', 'reset_language_cache'):
-        setattr(module, name, serialize(getattr(module, name)))
-    # Surface APIs can load these layers directly, bypassing _load_catalog.
-    # Their parse/build/publish must finish before a facade reset clears them.
-    for name in ('overlay_layer', 'overlay_languages'):
-        setattr(module.i18n_layers, name, serialize(getattr(module.i18n_layers, name)))
-    module._codon_locale_singleflight = True
-    return True
+    global _ADAPTER
+    with _LOAD_LOCK:
+        if _ADAPTER is None:
+            path = Path(__file__).resolve().parents[1] / 'resource-harness' / 'locale_cache.py'
+            if not path.is_file():
+                from hermes_constants import get_hermes_home
+                path = get_hermes_home() / 'plugins/resource-harness/locale_cache.py'
+            spec = importlib.util.spec_from_file_location('_hermes_locale_cache', path)
+            adapter = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(adapter)
+            _ADAPTER = adapter
+    return _ADAPTER.install_locale_singleflight(module)

@@ -86,6 +86,16 @@ class HarnessTests(unittest.TestCase):
         self.assertTrue((self.root / "cleanup-failed").exists())
         h.release("broken", lambda _: None)
 
+    def test_cancelled_owner_cannot_reuse_its_existing_browser(self):
+        h = harness.Harness(self.root, browsers=1, wait=0)
+        h.retain("browser", "owner")
+        try:
+            with self.assertRaisesRegex(TimeoutError, "cancelled"):
+                h.retain("browser", "owner", lambda: True)
+            self.assertEqual(len(occupied(self.root)["browser"]), 1)
+        finally:
+            h.release("owner", lambda _: None)
+
     def test_coordinator_releases_browser_but_keeps_agent_slot(self):
         h = harness.Harness(self.root, browsers=2, wait=0)
         for owner in ("coordinator-one", "coordinator-two"):
@@ -161,7 +171,8 @@ class HarnessTests(unittest.TestCase):
         callbacks = {}
         done = threading.Event()
         class Context:
-            def get_config(self, _, default): return default
+            def get_config(self, key, default):
+                return False if key == "locale_singleflight" else default
             def register_middleware(self, name, cb): callbacks[name] = cb
             def register_hook(self, name, cb): callbacks[name] = cb
             def register_system_prompt_section(self, *_): pass

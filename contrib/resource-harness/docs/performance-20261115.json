@@ -1,0 +1,1286 @@
+{
+  "date": "2026-11-15",
+  "browser_comparison": {
+    "passed": true,
+    "paired_repetitions": 3,
+    "sessions_per_trial": 2,
+    "summary": {
+      "auto": {
+        "first_useful_browser_result_s": {
+          "median": 14.62530022696592,
+          "min": 14.625261652981862,
+          "max": 16.30264653591439
+        },
+        "all_browser_results_s": {
+          "median": 18.277355507947505,
+          "min": 17.964552979916334,
+          "max": 20.061655431985855
+        },
+        "workload_and_cleanup_s": {
+          "median": 21.66355110798031,
+          "min": 21.465686893090606,
+          "max": 23.297493947902694
+        },
+        "process_wall_s": {
+          "median": 33.223098636139184,
+          "min": 30.960838219849393,
+          "max": 35.07333593792282
+        },
+        "trial_cgroup_cpu_s": {
+          "median": 43.378913,
+          "min": 42.816089,
+          "max": 45.238394
+        },
+        "median_steady_browser_driver_pss_mib": 774.4697265625
+      },
+      "lightpanda": {
+        "first_useful_browser_result_s": {
+          "median": 5.615940766874701,
+          "min": 5.528119174065068,
+          "max": 5.830016732914373
+        },
+        "all_browser_results_s": {
+          "median": 7.500227067852393,
+          "min": 7.474228223087266,
+          "max": 7.552060157060623
+        },
+        "workload_and_cleanup_s": {
+          "median": 8.664010409032926,
+          "min": 8.575235005933791,
+          "max": 8.696091274963692
+        },
+        "process_wall_s": {
+          "median": 19.80529376096092,
+          "min": 19.3631439069286,
+          "max": 20.48685266613029
+        },
+        "trial_cgroup_cpu_s": {
+          "median": 20.378333,
+          "min": 20.056451,
+          "max": 20.4488
+        },
+        "median_steady_browser_driver_pss_mib": 99.853515625
+      }
+    },
+    "trials": [
+      {
+        "passed": true,
+        "engine": "auto",
+        "sessions": 2,
+        "startup_s": 6.3538985250052065,
+        "first_useful_browser_result_s": 14.62530022696592,
+        "all_browser_results_s": 17.964552979916334,
+        "workload_and_cleanup_s": 21.66355110798031,
+        "script_wall_s": 28.022220721002668,
+        "lanes": [
+          {
+            "first_call_s": 14.624773557065055,
+            "reused_call_s": 3.253707075957209,
+            "completion_s": 17.879017047816887,
+            "semantics_passed": true
+          },
+          {
+            "first_call_s": 14.662947708042338,
+            "reused_call_s": 3.3001203450839967,
+            "completion_s": 17.964552979916334,
+            "semantics_passed": true
+          }
+        ],
+        "peak": {
+          "browser_leases": 2,
+          "engine_instances": 2,
+          "lightpanda_instances": 0
+        },
+        "steady_memory": {
+          "browser_and_driver_pss_bytes": 812090368,
+          "whole_worker_pss_bytes": 931401728
+        },
+        "failure_checks": {},
+        "trial_cgroup_cpu_s": 42.816089,
+        "trial_cgroup_peak_memory_bytes": 795537408,
+        "host_load_before": [
+          1.23046875,
+          1.2294921875,
+          1.54541015625
+        ],
+        "host_load_after": [
+          3.990234375,
+          1.859375,
+          1.74560546875
+        ],
+        "locale_singleflight": true,
+        "cleanup_verified": true,
+        "external_message_sends": 0,
+        "model_calls": 0,
+        "scope": "real Hermes dispatch and browser; local dynamic HTTP fixture; no provider latency",
+        "process_wall_s": 30.960838219849393,
+        "pair": 1
+      },
+      {
+        "passed": true,
+        "engine": "lightpanda",
+        "sessions": 2,
+        "startup_s": 8.32817120384425,
+        "first_useful_browser_result_s": 5.528119174065068,
+        "all_browser_results_s": 7.474228223087266,
+        "workload_and_cleanup_s": 8.575235005933791,
+        "script_wall_s": 16.90804812288843,
+        "lanes": [
+          {
+            "first_call_s": 6.060349545907229,
+            "reused_call_s": 1.4128109400626272,
+            "completion_s": 7.474228223087266,
+            "semantics_passed": true
+          },
+          {
+            "first_call_s": 5.524750696029514,
+            "reused_call_s": 1.6403426120523363,
+            "completion_s": 7.168470364995301,
+            "semantics_passed": true
+          }
+        ],
+        "peak": {
+          "browser_leases": 2,
+          "engine_instances": 2,
+          "lightpanda_instances": 2
+        },
+        "steady_memory": {
+          "browser_and_driver_pss_bytes": 104704000,
+          "whole_worker_pss_bytes": 221885440
+        },
+        "failure_checks": {},
+        "trial_cgroup_cpu_s": 20.4488,
+        "trial_cgroup_peak_memory_bytes": 244244480,
+        "host_load_before": [
+          4.587890625,
+          2.06103515625,
+          1.81298828125
+        ],
+        "host_load_after": [
+          5.11279296875,
+          2.2568359375,
+          1.8798828125
+        ],
+        "locale_singleflight": true,
+        "cleanup_verified": true,
+        "external_message_sends": 0,
+        "model_calls": 0,
+        "scope": "real Hermes dispatch and browser; local dynamic HTTP fixture; no provider latency",
+        "process_wall_s": 20.48685266613029,
+        "pair": 1
+      },
+      {
+        "passed": true,
+        "engine": "lightpanda",
+        "sessions": 2,
+        "startup_s": 7.662088013952598,
+        "first_useful_browser_result_s": 5.615940766874701,
+        "all_browser_results_s": 7.552060157060623,
+        "workload_and_cleanup_s": 8.696091274963692,
+        "script_wall_s": 16.363221919862553,
+        "lanes": [
+          {
+            "first_call_s": 6.040227526100352,
+            "reused_call_s": 1.5110014190431684,
+            "completion_s": 7.552060157060623,
+            "semantics_passed": true
+          },
+          {
+            "first_call_s": 5.6136436748784035,
+            "reused_call_s": 1.7419399409554899,
+            "completion_s": 7.3578895828686655,
+            "semantics_passed": true
+          }
+        ],
+        "peak": {
+          "browser_leases": 2,
+          "engine_instances": 2,
+          "lightpanda_instances": 2
+        },
+        "steady_memory": {
+          "browser_and_driver_pss_bytes": 104720384,
+          "whole_worker_pss_bytes": 221934592
+        },
+        "failure_checks": {},
+        "trial_cgroup_cpu_s": 20.378333,
+        "trial_cgroup_peak_memory_bytes": 234299392,
+        "host_load_before": [
+          4.9287109375,
+          2.31396484375,
+          1.9033203125
+        ],
+        "host_load_after": [
+          5.18017578125,
+          2.45263671875,
+          1.953125
+        ],
+        "locale_singleflight": true,
+        "cleanup_verified": true,
+        "external_message_sends": 0,
+        "model_calls": 0,
+        "scope": "real Hermes dispatch and browser; local dynamic HTTP fixture; no provider latency",
+        "process_wall_s": 19.80529376096092,
+        "pair": 2
+      },
+      {
+        "passed": true,
+        "engine": "auto",
+        "sessions": 2,
+        "startup_s": 8.719023124082014,
+        "first_useful_browser_result_s": 16.30264653591439,
+        "all_browser_results_s": 20.061655431985855,
+        "workload_and_cleanup_s": 23.297493947902694,
+        "script_wall_s": 32.02139830798842,
+        "lanes": [
+          {
+            "first_call_s": 17.176465578842908,
+            "reused_call_s": 2.884617456002161,
+            "completion_s": 20.061655431985855,
+            "semantics_passed": true
+          },
+          {
+            "first_call_s": 16.30110020795837,
+            "reused_call_s": 3.3216519011184573,
+            "completion_s": 19.624306700890884,
+            "semantics_passed": true
+          }
+        ],
+        "peak": {
+          "browser_leases": 2,
+          "engine_instances": 2,
+          "lightpanda_instances": 0
+        },
+        "steady_memory": {
+          "browser_and_driver_pss_bytes": 816703488,
+          "whole_worker_pss_bytes": 935821312
+        },
+        "failure_checks": {},
+        "trial_cgroup_cpu_s": 45.238394,
+        "trial_cgroup_peak_memory_bytes": 801099776,
+        "host_load_before": [
+          5.40576171875,
+          2.58740234375,
+          2.00244140625
+        ],
+        "host_load_after": [
+          6.8515625,
+          3.1396484375,
+          2.2001953125
+        ],
+        "locale_singleflight": true,
+        "cleanup_verified": true,
+        "external_message_sends": 0,
+        "model_calls": 0,
+        "scope": "real Hermes dispatch and browser; local dynamic HTTP fixture; no provider latency",
+        "process_wall_s": 35.07333593792282,
+        "pair": 2
+      },
+      {
+        "passed": true,
+        "engine": "auto",
+        "sessions": 2,
+        "startup_s": 7.985486076911911,
+        "first_useful_browser_result_s": 14.625261652981862,
+        "all_browser_results_s": 18.277355507947505,
+        "workload_and_cleanup_s": 21.465686893090606,
+        "script_wall_s": 29.456078401999548,
+        "lanes": [
+          {
+            "first_call_s": 14.624674563063309,
+            "reused_call_s": 3.090147151146084,
+            "completion_s": 17.715418365085497,
+            "semantics_passed": true
+          },
+          {
+            "first_call_s": 15.25583322509192,
+            "reused_call_s": 3.0197020759806037,
+            "completion_s": 18.277355507947505,
+            "semantics_passed": true
+          }
+        ],
+        "peak": {
+          "browser_leases": 2,
+          "engine_instances": 2,
+          "lightpanda_instances": 0
+        },
+        "steady_memory": {
+          "browser_and_driver_pss_bytes": 806630400,
+          "whole_worker_pss_bytes": 924155904
+        },
+        "failure_checks": {},
+        "trial_cgroup_cpu_s": 43.378913,
+        "trial_cgroup_peak_memory_bytes": 785100800,
+        "host_load_before": [
+          6.10546875,
+          3.1015625,
+          2.197265625
+        ],
+        "host_load_after": [
+          8.11181640625,
+          3.771484375,
+          2.43896484375
+        ],
+        "locale_singleflight": true,
+        "cleanup_verified": true,
+        "external_message_sends": 0,
+        "model_calls": 0,
+        "scope": "real Hermes dispatch and browser; local dynamic HTTP fixture; no provider latency",
+        "process_wall_s": 33.223098636139184,
+        "pair": 3
+      },
+      {
+        "passed": true,
+        "engine": "lightpanda",
+        "sessions": 2,
+        "startup_s": 7.592868069186807,
+        "first_useful_browser_result_s": 5.830016732914373,
+        "all_browser_results_s": 7.500227067852393,
+        "workload_and_cleanup_s": 8.664010409032926,
+        "script_wall_s": 16.261607008054852,
+        "lanes": [
+          {
+            "first_call_s": 5.829344063997269,
+            "reused_call_s": 1.670201016124338,
+            "completion_s": 7.500227067852393,
+            "semantics_passed": true
+          },
+          {
+            "first_call_s": 5.907145258970559,
+            "reused_call_s": 1.5516976269427687,
+            "completion_s": 7.462162748910487,
+            "semantics_passed": true
+          }
+        ],
+        "peak": {
+          "browser_leases": 2,
+          "engine_instances": 2,
+          "lightpanda_instances": 2
+        },
+        "steady_memory": {
+          "browser_and_driver_pss_bytes": 104687616,
+          "whole_worker_pss_bytes": 221725696
+        },
+        "failure_checks": {},
+        "trial_cgroup_cpu_s": 20.056451,
+        "trial_cgroup_peak_memory_bytes": 235921408,
+        "host_load_before": [
+          7.392578125,
+          3.76220703125,
+          2.45068359375
+        ],
+        "host_load_after": [
+          7.73876953125,
+          3.95263671875,
+          2.52685546875
+        ],
+        "locale_singleflight": true,
+        "cleanup_verified": true,
+        "external_message_sends": 0,
+        "model_calls": 0,
+        "scope": "real Hermes dispatch and browser; local dynamic HTTP fixture; no provider latency",
+        "process_wall_s": 19.3631439069286,
+        "pair": 3
+      }
+    ],
+    "scope": "controlled local-browser E2E; no estimate of user/model/network latency",
+    "measurement_notes": {
+      "latency": "All-results timing ends before expensive PSS sampling; local HTTP fixture included, external provider/network waits excluded.",
+      "cpu": "Worker-entry to pre-receipt cgroup counter delta, includes driver/engine, cleanup and post-work PSS sampling; excludes interpreter/bootstrap imports.",
+      "memory": "Steady browser/driver proportional-set-size snapshot after timed browser work, not peak PSS."
+    }
+  },
+  "four_sessions": {
+    "passed": true,
+    "engine": "lightpanda",
+    "sessions": 4,
+    "startup_s": 6.033400262938812,
+    "first_useful_browser_result_s": 7.9343510589096695,
+    "all_browser_results_s": 11.144970174878836,
+    "workload_and_cleanup_s": 13.099144605919719,
+    "script_wall_s": 41.33052459592,
+    "lanes": [
+      {
+        "first_call_s": 7.93384700990282,
+        "reused_call_s": 2.640158436028287,
+        "completion_s": 10.574518000008538,
+        "semantics_passed": true
+      },
+      {
+        "first_call_s": 8.059038629988208,
+        "reused_call_s": 3.0447992300614715,
+        "completion_s": 11.105423837900162,
+        "semantics_passed": true
+      },
+      {
+        "first_call_s": 8.184383325977251,
+        "reused_call_s": 2.956329758046195,
+        "completion_s": 11.144970174878836,
+        "semantics_passed": true
+      },
+      {
+        "first_call_s": 8.018154791090637,
+        "reused_call_s": 3.0633537620306015,
+        "completion_s": 11.086774072842672,
+        "semantics_passed": true
+      }
+    ],
+    "peak": {
+      "browser_leases": 4,
+      "engine_instances": 4,
+      "lightpanda_instances": 4
+    },
+    "steady_memory": {
+      "browser_and_driver_pss_bytes": 187615232,
+      "whole_worker_pss_bytes": 305568768
+    },
+    "failure_checks": {
+      "cancelled_existing_owner_blocked": true,
+      "timeout_cleanup_verified": true,
+      "timeout_cleanup_s": 17.209598840912804,
+      "replacement_session_passed": true
+    },
+    "trial_cgroup_cpu_s": 36.052399,
+    "trial_cgroup_peak_memory_bytes": 353951744,
+    "host_load_before": [
+      0.66650390625,
+      1.12841796875,
+      1.55029296875
+    ],
+    "host_load_after": [
+      1.5205078125,
+      1.3134765625,
+      1.59765625
+    ],
+    "locale_singleflight": true,
+    "cleanup_verified": true,
+    "external_message_sends": 0,
+    "model_calls": 0,
+    "scope": "real Hermes dispatch and browser; local dynamic HTTP fixture; no provider latency"
+  },
+  "locale_comparison": {
+    "before": {
+      "median_wall_s": 7.631908135022968,
+      "median_cpu_s": 6.277245527,
+      "trials": [
+        {
+          "locale_singleflight": false,
+          "cold_workers": 3,
+          "wall_s": 7.6348571460694075,
+          "process_cpu_s": 6.311342593,
+          "bundled_parse_calls": 3,
+          "catalog_entries": 3433,
+          "equivalent_catalogs": true,
+          "shared_result": false
+        },
+        {
+          "locale_singleflight": false,
+          "cold_workers": 3,
+          "wall_s": 7.631908135022968,
+          "process_cpu_s": 6.228291227000001,
+          "bundled_parse_calls": 3,
+          "catalog_entries": 3433,
+          "equivalent_catalogs": true,
+          "shared_result": false
+        },
+        {
+          "locale_singleflight": false,
+          "cold_workers": 3,
+          "wall_s": 7.447076505981386,
+          "process_cpu_s": 6.277245527,
+          "bundled_parse_calls": 3,
+          "catalog_entries": 3433,
+          "equivalent_catalogs": true,
+          "shared_result": false
+        }
+      ]
+    },
+    "after": {
+      "median_wall_s": 2.0592207990121096,
+      "median_cpu_s": 1.988252032,
+      "trials": [
+        {
+          "locale_singleflight": true,
+          "cold_workers": 3,
+          "wall_s": 2.0592207990121096,
+          "process_cpu_s": 1.988252032,
+          "bundled_parse_calls": 1,
+          "catalog_entries": 3433,
+          "equivalent_catalogs": true,
+          "shared_result": true
+        },
+        {
+          "locale_singleflight": true,
+          "cold_workers": 3,
+          "wall_s": 2.288925000000745,
+          "process_cpu_s": 2.123953976,
+          "bundled_parse_calls": 1,
+          "catalog_entries": 3433,
+          "equivalent_catalogs": true,
+          "shared_result": true
+        },
+        {
+          "locale_singleflight": true,
+          "cold_workers": 3,
+          "wall_s": 1.8978435948956758,
+          "process_cpu_s": 1.8546116099999999,
+          "bundled_parse_calls": 1,
+          "catalog_entries": 3433,
+          "equivalent_catalogs": true,
+          "shared_result": true
+        }
+      ]
+    }
+  },
+  "provider_canary": {
+    "auto": {
+      "model": "gpt-6.1-sol",
+      "passed": true,
+      "waves": [
+        {
+          "wave": "first_jobs",
+          "wall_s": 32.33784452592954,
+          "process_cpu_s": 20.200690558999998,
+          "states": [
+            "completed",
+            "completed",
+            "completed"
+          ],
+          "successful_search_calls": 2,
+          "successful_browser_calls": 1,
+          "per_job_tool_semantics": [
+            true,
+            true,
+            true
+          ],
+          "browser_title_verified": true
+        },
+        {
+          "wave": "process_warm_new_sessions",
+          "wall_s": 13.57269098307006,
+          "process_cpu_s": 3.662350324999995,
+          "states": [
+            "completed",
+            "completed",
+            "completed"
+          ],
+          "successful_search_calls": 2,
+          "successful_browser_calls": 1,
+          "per_job_tool_semantics": [
+            true,
+            true,
+            true
+          ],
+          "browser_title_verified": true
+        }
+      ],
+      "cleanup_verified": true,
+      "locale_singleflight": false,
+      "wall_s": 52.0274856928736,
+      "process_cpu_s": 28.755965454000005,
+      "profile_scope": "isolated actual GatewayRuntime workers; browser subprocess CPU excluded",
+      "external_message_sends": 0,
+      "stage_summary": {
+        "startup": {
+          "startup_imports_and_discovery": {
+            "wall_union_s": 4.705907478928566,
+            "aggregate_thread_cpu_s": 4.2569299140000005,
+            "calls": 1
+          }
+        },
+        "first_jobs": {
+          "admission:agents": {
+            "wall_union_s": 0.03349901898764074,
+            "aggregate_thread_cpu_s": 0.008169851999999977,
+            "calls": 3
+          },
+          "admission:api": {
+            "wall_union_s": 0.07581735169515014,
+            "aggregate_thread_cpu_s": 0.015166588000000522,
+            "calls": 8
+          },
+          "admission:browser": {
+            "wall_union_s": 0.0036108039785176516,
+            "aggregate_thread_cpu_s": 0.000928887,
+            "calls": 1
+          },
+          "database:_execute_write": {
+            "wall_union_s": 1.0292447018437088,
+            "aggregate_thread_cpu_s": 0.16229973699999956,
+            "calls": 72
+          },
+          "database:_read_retrying_ioerr": {
+            "wall_union_s": 0.325956053333357,
+            "aggregate_thread_cpu_s": 0.05930700399999743,
+            "calls": 123
+          },
+          "phase:announce_api_call": {
+            "wall_union_s": 7.80629313737154,
+            "aggregate_thread_cpu_s": 6.537965349,
+            "calls": 6
+          },
+          "phase:apply_retry_restarts": {
+            "wall_union_s": 0.000660050893202424,
+            "aggregate_thread_cpu_s": 0.0006608329999995277,
+            "calls": 6
+          },
+          "phase:assemble_api_request": {
+            "wall_union_s": 0.20233203889802098,
+            "aggregate_thread_cpu_s": 0.03870542500000024,
+            "calls": 6
+          },
+          "phase:begin_iteration": {
+            "wall_union_s": 0.04292265488766134,
+            "aggregate_thread_cpu_s": 0.002463442000000038,
+            "calls": 6
+          },
+          "phase:build_api_request": {
+            "wall_union_s": 0.12732741027139127,
+            "aggregate_thread_cpu_s": 0.10762785399999997,
+            "calls": 6
+          },
+          "phase:check_api_response": {
+            "wall_union_s": 0.2474972049240023,
+            "aggregate_thread_cpu_s": 0.027136163000000213,
+            "calls": 6
+          },
+          "phase:finish_text_response": {
+            "wall_union_s": 0.07286443212069571,
+            "aggregate_thread_cpu_s": 0.019868124999999903,
+            "calls": 3
+          },
+          "phase:normalize_model_response": {
+            "wall_union_s": 0.0449524091091007,
+            "aggregate_thread_cpu_s": 0.009086145000000379,
+            "calls": 6
+          },
+          "phase:nous_rate_limit_guard": {
+            "wall_union_s": 0.000836807070299983,
+            "aggregate_thread_cpu_s": 0.0008036679999996466,
+            "calls": 6
+          },
+          "phase:perform_api_call": {
+            "wall_union_s": 9.917023062938824,
+            "aggregate_thread_cpu_s": 0.12634237999999964,
+            "calls": 6
+          },
+          "phase:prepare_iteration": {
+            "wall_union_s": 0.003298388095572591,
+            "aggregate_thread_cpu_s": 0.00307989100000039,
+            "calls": 6
+          },
+          "phase:run_preflight_gate": {
+            "wall_union_s": 0.017811587313190103,
+            "aggregate_thread_cpu_s": 0.005372131999999863,
+            "calls": 6
+          },
+          "phase:run_tool_round": {
+            "wall_union_s": 7.167417728109285,
+            "aggregate_thread_cpu_s": 0.1309385380000001,
+            "calls": 3
+          },
+          "provider_transport": {
+            "wall_union_s": 9.870639460394159,
+            "aggregate_thread_cpu_s": 0.08350173499999958,
+            "calls": 6
+          },
+          "system_prompt": {
+            "wall_union_s": 2.935128292068839,
+            "aggregate_thread_cpu_s": 1.308678291,
+            "calls": 3
+          },
+          "tool:browser_exec": {
+            "wall_union_s": 6.945783226052299,
+            "aggregate_thread_cpu_s": 0.605167638,
+            "calls": 1
+          },
+          "tool:web_search": {
+            "wall_union_s": 2.529589271871373,
+            "aggregate_thread_cpu_s": 0.47290660800000006,
+            "calls": 2
+          },
+          "turn_context": {
+            "wall_union_s": 3.287381867878139,
+            "aggregate_thread_cpu_s": 1.500555016,
+            "calls": 3
+          }
+        },
+        "process_warm_new_sessions": {
+          "admission:agents": {
+            "wall_union_s": 0.003181925043463707,
+            "aggregate_thread_cpu_s": 0.002867111999999991,
+            "calls": 3
+          },
+          "admission:api": {
+            "wall_union_s": 0.006984659004956484,
+            "aggregate_thread_cpu_s": 0.006243962000000003,
+            "calls": 8
+          },
+          "admission:browser": {
+            "wall_union_s": 0.0004867240786552429,
+            "aggregate_thread_cpu_s": 0.00048313,
+            "calls": 1
+          },
+          "database:_execute_write": {
+            "wall_union_s": 0.8759739107917994,
+            "aggregate_thread_cpu_s": 0.15187142399999998,
+            "calls": 72
+          },
+          "database:_read_retrying_ioerr": {
+            "wall_union_s": 0.17365033365786076,
+            "aggregate_thread_cpu_s": 0.06922191800000156,
+            "calls": 123
+          },
+          "phase:announce_api_call": {
+            "wall_union_s": 0.011186219984665513,
+            "aggregate_thread_cpu_s": 0.006054798000000028,
+            "calls": 6
+          },
+          "phase:apply_retry_restarts": {
+            "wall_union_s": 0.0004600989632308483,
+            "aggregate_thread_cpu_s": 0.0004601499999999925,
+            "calls": 6
+          },
+          "phase:assemble_api_request": {
+            "wall_union_s": 0.04883788898587227,
+            "aggregate_thread_cpu_s": 0.02179394400000001,
+            "calls": 6
+          },
+          "phase:begin_iteration": {
+            "wall_union_s": 0.002455652691423893,
+            "aggregate_thread_cpu_s": 0.0011964069999999966,
+            "calls": 6
+          },
+          "phase:build_api_request": {
+            "wall_union_s": 0.642312808893621,
+            "aggregate_thread_cpu_s": 0.080449072,
+            "calls": 6
+          },
+          "phase:check_api_response": {
+            "wall_union_s": 0.12144452542997897,
+            "aggregate_thread_cpu_s": 0.023094277999999996,
+            "calls": 6
+          },
+          "phase:finish_text_response": {
+            "wall_union_s": 0.04868542426265776,
+            "aggregate_thread_cpu_s": 0.015602346999999989,
+            "calls": 3
+          },
+          "phase:normalize_model_response": {
+            "wall_union_s": 0.03392197214998305,
+            "aggregate_thread_cpu_s": 0.008182836999999957,
+            "calls": 6
+          },
+          "phase:nous_rate_limit_guard": {
+            "wall_union_s": 0.000369073124602437,
+            "aggregate_thread_cpu_s": 0.0003677980000000164,
+            "calls": 6
+          },
+          "phase:perform_api_call": {
+            "wall_union_s": 10.048242122167721,
+            "aggregate_thread_cpu_s": 0.06547698399999999,
+            "calls": 6
+          },
+          "phase:prepare_iteration": {
+            "wall_union_s": 0.0017841712106019258,
+            "aggregate_thread_cpu_s": 0.0017934820000000268,
+            "calls": 6
+          },
+          "phase:run_preflight_gate": {
+            "wall_union_s": 0.017451404128223658,
+            "aggregate_thread_cpu_s": 0.004197276999999985,
+            "calls": 6
+          },
+          "phase:run_tool_round": {
+            "wall_union_s": 6.365819851867855,
+            "aggregate_thread_cpu_s": 0.07613251899999998,
+            "calls": 3
+          },
+          "provider_transport": {
+            "wall_union_s": 10.019561936846003,
+            "aggregate_thread_cpu_s": 0.047934591000000054,
+            "calls": 6
+          },
+          "system_prompt": {
+            "wall_union_s": 0.0892726881429553,
+            "aggregate_thread_cpu_s": 0.045123039,
+            "calls": 3
+          },
+          "tool:browser_exec": {
+            "wall_union_s": 6.253131498815492,
+            "aggregate_thread_cpu_s": 0.207776978,
+            "calls": 1
+          },
+          "tool:web_search": {
+            "wall_union_s": 0.11910615186206996,
+            "aggregate_thread_cpu_s": 0.024904074,
+            "calls": 2
+          },
+          "turn_context": {
+            "wall_union_s": 0.4036735501140356,
+            "aggregate_thread_cpu_s": 0.17635322,
+            "calls": 3
+          }
+        }
+      }
+    },
+    "lightpanda": {
+      "model": "gpt-6.1-sol",
+      "passed": true,
+      "waves": [
+        {
+          "wave": "first_jobs",
+          "wall_s": 21.570485580014065,
+          "process_cpu_s": 13.174657000000002,
+          "states": [
+            "completed",
+            "completed",
+            "completed"
+          ],
+          "successful_search_calls": 2,
+          "successful_browser_calls": 1,
+          "per_job_tool_semantics": [
+            true,
+            true,
+            true
+          ],
+          "browser_title_verified": true
+        },
+        {
+          "wave": "process_warm_new_sessions",
+          "wall_s": 7.943753683008254,
+          "process_cpu_s": 2.7237660529999985,
+          "states": [
+            "completed",
+            "completed",
+            "completed"
+          ],
+          "successful_search_calls": 2,
+          "successful_browser_calls": 1,
+          "per_job_tool_semantics": [
+            true,
+            true,
+            true
+          ],
+          "browser_title_verified": true
+        }
+      ],
+      "cleanup_verified": true,
+      "locale_singleflight": true,
+      "wall_s": 33.95735024404712,
+      "process_cpu_s": 19.864873826,
+      "profile_scope": "isolated actual GatewayRuntime workers; browser subprocess CPU excluded",
+      "external_message_sends": 0,
+      "stage_summary": {
+        "startup": {
+          "startup_imports_and_discovery": {
+            "wall_union_s": 3.845404146006331,
+            "aggregate_thread_cpu_s": 3.595612778,
+            "calls": 1
+          }
+        },
+        "first_jobs": {
+          "admission:agents": {
+            "wall_union_s": 0.021545286057516932,
+            "aggregate_thread_cpu_s": 0.003722619000000149,
+            "calls": 3
+          },
+          "admission:api": {
+            "wall_union_s": 0.03591142734512687,
+            "aggregate_thread_cpu_s": 0.007863663000000007,
+            "calls": 8
+          },
+          "admission:browser": {
+            "wall_union_s": 0.0014485199935734272,
+            "aggregate_thread_cpu_s": 0.0007725399999999999,
+            "calls": 1
+          },
+          "database:_execute_write": {
+            "wall_union_s": 0.5362489521503448,
+            "aggregate_thread_cpu_s": 0.13188501299999994,
+            "calls": 72
+          },
+          "database:_read_retrying_ioerr": {
+            "wall_union_s": 0.24151219450868666,
+            "aggregate_thread_cpu_s": 0.05637415399999902,
+            "calls": 123
+          },
+          "phase:announce_api_call": {
+            "wall_union_s": 1.7010443550534546,
+            "aggregate_thread_cpu_s": 1.6515393720000004,
+            "calls": 6
+          },
+          "phase:apply_retry_restarts": {
+            "wall_union_s": 0.0006154179573059082,
+            "aggregate_thread_cpu_s": 0.0006161100000002251,
+            "calls": 6
+          },
+          "phase:assemble_api_request": {
+            "wall_union_s": 0.05168395792134106,
+            "aggregate_thread_cpu_s": 0.024166887000000137,
+            "calls": 6
+          },
+          "phase:begin_iteration": {
+            "wall_union_s": 0.0011473526246845722,
+            "aggregate_thread_cpu_s": 0.0011515549999996932,
+            "calls": 6
+          },
+          "phase:build_api_request": {
+            "wall_union_s": 0.08433810994029045,
+            "aggregate_thread_cpu_s": 0.07368956000000015,
+            "calls": 6
+          },
+          "phase:check_api_response": {
+            "wall_union_s": 0.061491601169109344,
+            "aggregate_thread_cpu_s": 0.02272525700000011,
+            "calls": 6
+          },
+          "phase:finish_text_response": {
+            "wall_union_s": 0.024557567900046706,
+            "aggregate_thread_cpu_s": 0.016084963000000396,
+            "calls": 3
+          },
+          "phase:normalize_model_response": {
+            "wall_union_s": 0.012361733010038733,
+            "aggregate_thread_cpu_s": 0.0066313530000001175,
+            "calls": 6
+          },
+          "phase:nous_rate_limit_guard": {
+            "wall_union_s": 0.000546939903870225,
+            "aggregate_thread_cpu_s": 0.0005303149999998369,
+            "calls": 6
+          },
+          "phase:perform_api_call": {
+            "wall_union_s": 8.892823312897235,
+            "aggregate_thread_cpu_s": 0.08551042500000006,
+            "calls": 6
+          },
+          "phase:prepare_iteration": {
+            "wall_union_s": 0.0018554439302533865,
+            "aggregate_thread_cpu_s": 0.0018650750000001604,
+            "calls": 6
+          },
+          "phase:run_preflight_gate": {
+            "wall_union_s": 0.020976519910618663,
+            "aggregate_thread_cpu_s": 0.003606593000000047,
+            "calls": 6
+          },
+          "phase:run_tool_round": {
+            "wall_union_s": 4.577601931989193,
+            "aggregate_thread_cpu_s": 0.11835181499999997,
+            "calls": 3
+          },
+          "provider_transport": {
+            "wall_union_s": 8.87362783192657,
+            "aggregate_thread_cpu_s": 0.06352873700000017,
+            "calls": 6
+          },
+          "system_prompt": {
+            "wall_union_s": 2.2513102020602673,
+            "aggregate_thread_cpu_s": 0.9759217950000001,
+            "calls": 3
+          },
+          "tool:browser_exec": {
+            "wall_union_s": 3.0451985399704427,
+            "aggregate_thread_cpu_s": 0.442055291,
+            "calls": 1
+          },
+          "tool:web_search": {
+            "wall_union_s": 4.484811763977632,
+            "aggregate_thread_cpu_s": 0.416390899,
+            "calls": 2
+          },
+          "turn_context": {
+            "wall_union_s": 2.4810835868120193,
+            "aggregate_thread_cpu_s": 1.136929726,
+            "calls": 3
+          }
+        },
+        "process_warm_new_sessions": {
+          "admission:agents": {
+            "wall_union_s": 0.004238841123878956,
+            "aggregate_thread_cpu_s": 0.0027203500000000103,
+            "calls": 3
+          },
+          "admission:api": {
+            "wall_union_s": 0.008878066670149565,
+            "aggregate_thread_cpu_s": 0.006749314999999932,
+            "calls": 8
+          },
+          "admission:browser": {
+            "wall_union_s": 0.0007008309476077557,
+            "aggregate_thread_cpu_s": 0.0005521670000000001,
+            "calls": 1
+          },
+          "database:_execute_write": {
+            "wall_union_s": 0.5573740287218243,
+            "aggregate_thread_cpu_s": 0.1507583909999991,
+            "calls": 72
+          },
+          "database:_read_retrying_ioerr": {
+            "wall_union_s": 0.1639081477187574,
+            "aggregate_thread_cpu_s": 0.05782192500000088,
+            "calls": 123
+          },
+          "phase:announce_api_call": {
+            "wall_union_s": 0.012586513767018914,
+            "aggregate_thread_cpu_s": 0.00578008800000003,
+            "calls": 6
+          },
+          "phase:apply_retry_restarts": {
+            "wall_union_s": 0.0003790061455219984,
+            "aggregate_thread_cpu_s": 0.00037862799999999197,
+            "calls": 6
+          },
+          "phase:assemble_api_request": {
+            "wall_union_s": 0.038299751933664083,
+            "aggregate_thread_cpu_s": 0.02252963200000002,
+            "calls": 6
+          },
+          "phase:begin_iteration": {
+            "wall_union_s": 0.0009822309948503971,
+            "aggregate_thread_cpu_s": 0.0009844260000000243,
+            "calls": 6
+          },
+          "phase:build_api_request": {
+            "wall_union_s": 0.09106667689047754,
+            "aggregate_thread_cpu_s": 0.07656440299999999,
+            "calls": 6
+          },
+          "phase:check_api_response": {
+            "wall_union_s": 0.032632086891680956,
+            "aggregate_thread_cpu_s": 0.01826511199999996,
+            "calls": 6
+          },
+          "phase:finish_text_response": {
+            "wall_union_s": 0.03123208903707564,
+            "aggregate_thread_cpu_s": 0.014721833000000017,
+            "calls": 3
+          },
+          "phase:normalize_model_response": {
+            "wall_union_s": 0.017510789213702083,
+            "aggregate_thread_cpu_s": 0.006955256000000021,
+            "calls": 6
+          },
+          "phase:nous_rate_limit_guard": {
+            "wall_union_s": 0.00034913700073957443,
+            "aggregate_thread_cpu_s": 0.0003471670000000232,
+            "calls": 6
+          },
+          "phase:perform_api_call": {
+            "wall_union_s": 6.468958840938285,
+            "aggregate_thread_cpu_s": 0.06231583200000003,
+            "calls": 6
+          },
+          "phase:prepare_iteration": {
+            "wall_union_s": 0.001887608552351594,
+            "aggregate_thread_cpu_s": 0.0019072230000000273,
+            "calls": 6
+          },
+          "phase:run_preflight_gate": {
+            "wall_union_s": 0.008076942060142756,
+            "aggregate_thread_cpu_s": 0.0028319829999999407,
+            "calls": 6
+          },
+          "phase:run_tool_round": {
+            "wall_union_s": 3.0666235440876335,
+            "aggregate_thread_cpu_s": 0.07214482299999998,
+            "calls": 3
+          },
+          "provider_transport": {
+            "wall_union_s": 6.464341441169381,
+            "aggregate_thread_cpu_s": 0.045248499,
+            "calls": 6
+          },
+          "system_prompt": {
+            "wall_union_s": 0.13789804419502616,
+            "aggregate_thread_cpu_s": 0.075783087,
+            "calls": 3
+          },
+          "tool:browser_exec": {
+            "wall_union_s": 2.5581728159449995,
+            "aggregate_thread_cpu_s": 0.096038833,
+            "calls": 1
+          },
+          "tool:web_search": {
+            "wall_union_s": 1.0335958539508283,
+            "aggregate_thread_cpu_s": 0.07922323199999999,
+            "calls": 2
+          },
+          "turn_context": {
+            "wall_union_s": 0.39550608000718057,
+            "aggregate_thread_cpu_s": 0.23168482699999998,
+            "calls": 3
+          }
+        }
+      }
+    }
+  },
+  "e2e": {
+    "auto": {
+      "run": "rh-e2e-5c3b24c047a8",
+      "passed": true,
+      "peak": {
+        "api": 10,
+        "browser": 2,
+        "managed_browsers": 2
+      },
+      "api_requests": 10,
+      "real_browser_jobs": 4,
+      "nested_coordinators": 2,
+      "nested_browser_children": 2,
+      "remaining_leases": {
+        "agents": [],
+        "api": [],
+        "browser": []
+      },
+      "remaining_browser_daemons": 0,
+      "uses_real_model_provider": false
+    },
+    "lightpanda": {
+      "run": "rh-e2e-49f28382b90c",
+      "passed": true,
+      "peak": {
+        "api": 10,
+        "browser": 2,
+        "managed_browsers": 2
+      },
+      "api_requests": 10,
+      "real_browser_jobs": 4,
+      "nested_coordinators": 2,
+      "nested_browser_children": 2,
+      "remaining_leases": {
+        "agents": [],
+        "api": [],
+        "browser": []
+      },
+      "remaining_browser_daemons": 0,
+      "uses_real_model_provider": false
+    }
+  },
+  "manager_e2e": {
+    "passed": true,
+    "real_hermes_admission_and_delegation": true,
+    "provider": "deterministic fixture",
+    "telegram_delivery": "captured adapter; no external sends",
+    "early_discovery_bootstrap_before_intake": true,
+    "jobs": [
+      {
+        "id": 1,
+        "state": "completed"
+      },
+      {
+        "id": 2,
+        "state": "cancelled"
+      },
+      {
+        "id": 3,
+        "state": "completed"
+      }
+    ],
+    "latency_seconds": {
+      "first": 0.168,
+      "while_worker_running": 0.039,
+      "status": 0.044
+    },
+    "steering_applied": true,
+    "selected_cancellation": true,
+    "approval_isolation": true,
+    "media_delegated": true,
+    "deduplication": true,
+    "main_agent_calls": 0,
+    "remaining_leases": {
+      "agents": [],
+      "api": [],
+      "browser": []
+    }
+  },
+  "direct_agent_browser": {
+    "passed": false,
+    "version": "0.26.0",
+    "lightpanda": "1.0.4",
+    "observed_error": "Operation timed out on open and close",
+    "production_route": "Browser Use/CDP; does not invoke this CLI"
+  },
+  "validation": {
+    "harness_tests": {
+      "passed": 57,
+      "failed": 0
+    },
+    "pilot_evidence_tests": {
+      "passed": 4,
+      "failed": 0
+    },
+    "installed_locale_regressions": {
+      "passed": 5,
+      "failed": 0
+    },
+    "full_core_suite": {
+      "passed": 11818,
+      "failed": 69,
+      "skipped": 97,
+      "errors": 46
+    },
+    "core_paths_modified": false,
+    "existing_hosted_ci_before_change": {
+      "passed": 11871,
+      "failed": 73,
+      "errors": 7,
+      "skipped": 35
+    }
+  },
+  "deployment": {
+    "passed": true,
+    "before_pid": "3258613",
+    "after_pid": "3260137",
+    "engine": "lightpanda",
+    "browser_slots": 2,
+    "api_slots": 10,
+    "agent_slots": 10,
+    "manager_jobs": 3,
+    "telegram_connected": true,
+    "manager_heartbeat_fresh": true,
+    "pi_rebooted": false,
+    "shared_cdp_override_removed": true,
+    "private_binary_prioritized": true,
+    "plugin_sha256": "ac1845ce4ecaed06f1ba10ab0f2a60ebdade07ded73294b147ffbec7aea78114",
+    "backup_created": true,
+    "gateway_restarts_during_upgrade": 3
+  },
+  "live_serving_gateway": {
+    "passed": true,
+    "run_id": "run_61372394ab6d44689e714645cb7f9261",
+    "serving_gateway_pid": 3260137,
+    "children": 10,
+    "successful_browser_calls": 4,
+    "successful_search_calls": 6,
+    "caller_correlated_lightpanda_owners": 4,
+    "observed_peak": {
+      "agents": 10,
+      "api": 10,
+      "browser": 2,
+      "lightpanda": 2
+    },
+    "private_runtime_verified": true,
+    "engine_status": [
+      true,
+      "Browser Use mode: Hermes spawns `lightpanda serve` per session"
+    ],
+    "cleanup_verified": true,
+    "remaining_caller_leases": 0,
+    "remaining_caller_engine_driver_processes": 0,
+    "external_message_sends": 0
+  },
+  "benchmark_qualification_source_sha256": {
+    "contrib/resource-harness/__init__.py": "7a3767868239a1618719b93548b3c3a48371f41b2ddfaf6ed07084b9b3ddaeda",
+    "contrib/resource-harness/browser_cleanup.py": "b4f2c3b25255e6fc521500e6ad42bc0d5a9cea5e72b906cb5d0e94f53bc34591",
+    "contrib/resource-harness/locale_cache.py": "6a2cd0116be47d367dca14869e38e3ef5fad6e9b8cde0e4086049dbe279e5263",
+    "contrib/resource-harness/research_prompt.md": "7290640e689c7f0d3f1d4f79bb37caace602f2f49b648054220053eb9b7f4fa2"
+  },
+  "final_deployed_source_sha256": {
+    "contrib/resource-harness/__init__.py": "ac1845ce4ecaed06f1ba10ab0f2a60ebdade07ded73294b147ffbec7aea78114",
+    "contrib/resource-harness/browser_cleanup.py": "13c3d631ffa144402674c78260b3620ede35bb63b541495bb7a431a9b26b91c0",
+    "contrib/resource-harness/locale_cache.py": "6a2cd0116be47d367dca14869e38e3ef5fad6e9b8cde0e4086049dbe279e5263",
+    "contrib/resource-harness/research_prompt.md": "7290640e689c7f0d3f1d4f79bb37caace602f2f49b648054220053eb9b7f4fa2"
+  },
+  "source_revision_note": "Controlled benchmark qualification predates guard-only endpoint/profile hardening; final deployed artifact hashes are separate."
+}

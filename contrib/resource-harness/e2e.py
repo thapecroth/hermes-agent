@@ -45,7 +45,7 @@ def main():
         (home / "config.yaml").write_text(yaml.safe_dump({
             "plugins": {"enabled": ["resource-harness"], "entries": {
                 "resource-harness": {"settings": {"queue_timeout_seconds": 240}}}},
-            "browser": {"backend": "browser-use", "engine": "auto", "cloud_provider": "local",
+            "browser": {"backend": "browser-use", "engine": os.environ.get("HERMES_E2E_BROWSER_ENGINE", "auto"), "cloud_provider": "local",
                         "allow_private_urls": True, "auto_local_for_private_urls": True},
             "terminal": {"backend": "local", "cwd": str(home)},
             "memory": {"memory_enabled": False, "user_profile_enabled": False},
