@@ -1,0 +1,54 @@
+# Hybrid launcher: this compiles the launcher; Hermes executes in embedded CPython.
+# Keep the boundary explicit. This is not a claim of whole-stack native compilation.
+from sys import argv, exit
+
+@python
+def launch(arguments: str) -> int:
+    import os
+    import signal
+    import sys
+    from pathlib import Path
+
+    root = Path(os.environ['HERMES_CODON_SOURCE']).resolve()
+    sys.path.insert(0, str(root))
+    from pm.environments import activate_dependencies
+    activate_dependencies(root)
+    import hermes_bootstrap
+    sys.argv = arguments.split('\0')
+    if os.environ.get('HERMES_CODON_LOCALE_SINGLEFLIGHT', '1') != '0':
+        import importlib.util
+        support = Path(sys.argv[0]).resolve().with_name('runtime_compat.py')
+        spec = importlib.util.spec_from_file_location('_hermes_codon_runtime_compat', support)
+        compat = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = compat
+        spec.loader.exec_module(compat)
+        compat.install_locale_singleflight()
+    # Hermes subprocess helpers must use the qualified Python, not host Python.
+    sys.executable = str(Path(sys.base_prefix) / 'bin/python3')
+    sys._base_executable = sys.executable
+    signal.signal(signal.SIGINT, signal.default_int_handler)
+    try:
+        if len(sys.argv) > 2 and sys.argv[1] == '--run-script':
+            import runpy
+            script = sys.argv.pop(2)
+            sys.argv.pop(1)
+            sys.argv[0] = script
+            runpy.run_path(script, run_name='__main__')
+            return 0
+        from hermes_cli.main import main
+        result = main()
+        return result if isinstance(result, int) else 0
+    except SystemExit as error:
+        if error.code is None:
+            return 0
+        if isinstance(error.code, int):
+            return error.code
+        print(error.code, file=sys.stderr)
+        return 1
+    except KeyboardInterrupt:
+        return 130
+    finally:
+        sys.stdout.flush()
+        sys.stderr.flush()
+
+exit(launch('\0'.join(argv)))

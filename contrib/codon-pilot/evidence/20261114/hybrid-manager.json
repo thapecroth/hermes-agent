@@ -1,0 +1,37 @@
+{
+  "passed": true,
+  "real_hermes_admission_and_delegation": true,
+  "provider": "deterministic fixture",
+  "telegram_delivery": "captured adapter; no external sends",
+  "early_discovery_bootstrap_before_intake": true,
+  "jobs": [
+    {
+      "id": 1,
+      "state": "completed"
+    },
+    {
+      "id": 2,
+      "state": "cancelled"
+    },
+    {
+      "id": 3,
+      "state": "completed"
+    }
+  ],
+  "latency_seconds": {
+    "first": 0.203,
+    "while_worker_running": 0.045,
+    "status": 0.073
+  },
+  "steering_applied": true,
+  "selected_cancellation": true,
+  "approval_isolation": true,
+  "media_delegated": true,
+  "deduplication": true,
+  "main_agent_calls": 0,
+  "remaining_leases": {
+    "agents": [],
+    "api": [],
+    "browser": []
+  }
+}

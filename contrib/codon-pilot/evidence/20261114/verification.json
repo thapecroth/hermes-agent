@@ -1,0 +1,77 @@
+{
+  "qualified_at": "2026-11-14T18:52:47.785338-08:00",
+  "whole_stack_native": false,
+  "focused_checks": {
+    "local_evidence_tests": {
+      "passed": 3
+    },
+    "actual_pi_locale_tests": {
+      "passed": 5
+    },
+    "unpatched_cold_load_regression": {
+      "expected_failure_reproduced": true,
+      "parses": 3,
+      "required": 1
+    }
+  },
+  "native_feature_probes": {
+    "total": 14,
+    "positive_controls_passed": 6,
+    "unsupported_features_failed": 8,
+    "all_builds_reused_on_resume": true,
+    "successful_binaries_reexecuted": true
+  },
+  "native_port": {
+    "errno_runtime_assertions_passed": true,
+    "whole_stack_native": false,
+    "retained_build_diagnostics": true
+  },
+  "research_e2e": {
+    "baseline_strict_passed": true,
+    "hybrid_passed": true,
+    "jobs_per_run": 6,
+    "per_job_semantics_verified": true,
+    "cleanup_verified": true,
+    "external_message_sends": 0
+  },
+  "hybrid_manager_e2e": {
+    "passed": true,
+    "main_agent_calls": 0,
+    "provider": "deterministic fixture",
+    "external_telegram_delivery_tested": false
+  },
+  "full_upstream_suite": {
+    "command": "python -m pytest tests/ -q",
+    "exit_code": 1,
+    "passed": 11819,
+    "failed": 68,
+    "errors": 46,
+    "skipped": 97,
+    "warnings": 200,
+    "wall_s": 142.4,
+    "scope": "unchanged fork core tests; pilot contributes only separate opt-in code and docs"
+  },
+  "profiler": {
+    "tool": "py-spy 0.4.3",
+    "baseline_strict_rate_hz": 49,
+    "baseline_strict_samples": 50744,
+    "baseline_strict_errors": 0,
+    "baseline_strict_sampling_lag": true,
+    "hybrid_rate_hz": 19,
+    "hybrid_samples": 15607,
+    "hybrid_errors": 0
+  },
+  "production": {
+    "launcher_changed": false,
+    "gateway_main_pid": 3170484,
+    "active": true,
+    "automatic_restarts": 0
+  },
+  "limitations": [
+    "Not a native Hermes port",
+    "No Codon end-to-end speedup established",
+    "Sampler rates, host load and provider latency differ",
+    "Browser subprocess CPU excluded",
+    "No external Telegram test message sent"
+  ]
+}

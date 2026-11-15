@@ -1,0 +1,188 @@
+{
+  "whole_stack_native": false,
+  "python_fallback": false,
+  "builds": {
+    "errno_shim": {
+      "source_sha256": "069239cac593723e967280d989267d98bf6a9f6f90c78356f45a9d996f6c4e2c",
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/native-port-final/errno_shim",
+          "/home/pi/hermes-codon-lab-20261114/native-port-final/check_errno.codon"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": "",
+        "wall_s": 30.273255249019712
+      },
+      "execution": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/native-port-final/errno_shim"
+        ],
+        "returncode": 0,
+        "stdout": "NATIVE_ERRNO_OK\n",
+        "stderr": "",
+        "wall_s": 0.01883013197220862
+      },
+      "semantics_passed": true
+    },
+    "hermes_cli": {
+      "source_sha256": "88a7fc166d3bfaac082d44bbfc36c93b53c50f7508ca96e32206dc3f1edfaa82",
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/native-port-final/hermes_cli",
+          "/home/pi/hermes-codon-lab-20261114/native-port-final/source/hermes_cli/main.codon"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "\u001b[1m/home/pi/hermes-codon-lab-20261114/native-port-final/source/hermes_bootstrap.codon:19 (1-21): \u001b[1;31merror:\u001b[0m\u001b[1m no module named 'importlib.abc'\u001b[0m\n\u2570\u2500 \u001b[1m\u001b[1;31merror:\u001b[0m\u001b[1m during the realization of <import hermes_bootstrap>\u001b[0m\n",
+        "wall_s": 15.714791440870613
+      }
+    },
+    "conversation_agent": {
+      "source_sha256": "2bd45c545c2cf0dec95702e71232f026b1265b54bf234a1c03c8cf83f5236f10",
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/native-port-final/conversation_agent",
+          "/home/pi/hermes-codon-lab-20261114/native-port-final/source/run_agent.codon"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "\u001b[1m/home/pi/hermes-codon-lab-20261114/native-port-final/source/run_agent.codon:214 (15): \u001b[1;31merror:\u001b[0m\u001b[1m syntax error, unexpected '\\n'\u001b[0m\n",
+        "wall_s": 0.18443498690612614
+      }
+    },
+    "session_database": {
+      "source_sha256": "c24484b3026a377621dd1a0f1d23de8e0d9d9d0b6d9600d47cee9368646c9577",
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/native-port-final/session_database",
+          "/home/pi/hermes-codon-lab-20261114/native-port-final/source/hermes_state.codon"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "\u001b[1m/home/pi/hermes-codon-lab-20261114/native-port-final/source/hermes_state.codon:460 (17): \u001b[1;31merror:\u001b[0m\u001b[1m syntax error, unexpected '\\n'\u001b[0m\n",
+        "wall_s": 0.3627069480717182
+      }
+    },
+    "locale_catalog": {
+      "source_sha256": "bdd29bd8e77c896137e81e04a0be26caf8a8185b4e7df237d2f1aa245a78e325",
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/native-port-final/locale_catalog",
+          "/home/pi/hermes-codon-lab-20261114/native-port-final/source/agent/i18n.codon"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "\u001b[1m/home/pi/hermes-codon-lab-20261114/native-port-final/source/agent/i18n.codon:19 (1-15): \u001b[1;31merror:\u001b[0m\u001b[1m no module named 'logging'\u001b[0m\n",
+        "wall_s": 14.369616467971355
+      }
+    },
+    "conversation_agent_adapted": {
+      "adaptation": "Flatten multiline class-base header; preserve line count",
+      "headers_changed": 1,
+      "source_sha256": "1f519dccfce7bb76d937b51e06b406876e363adc1137be3d8918d8dc38cd4777",
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/native-port-final/conversation_agent_adapted",
+          "/home/pi/hermes-codon-lab-20261114/native-port-final/source/run_agent.codon"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "\u001b[1m/home/pi/hermes-codon-lab-20261114/native-port-final/source/hermes_bootstrap.codon:19 (1-21): \u001b[1;31merror:\u001b[0m\u001b[1m no module named 'importlib.abc'\u001b[0m\n\u2570\u2500 \u001b[1m\u001b[1;31merror:\u001b[0m\u001b[1m during the realization of <import hermes_bootstrap>\u001b[0m\n",
+        "wall_s": 15.729865994071588
+      }
+    },
+    "session_database_adapted": {
+      "adaptation": "Flatten multiline class-base header; preserve line count",
+      "headers_changed": 1,
+      "source_sha256": "420ae1fcb2e30233afa7f4269c9b66658afe4aaab89dc8044fd94548c2caa499",
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/native-port-final/session_database_adapted",
+          "/home/pi/hermes-codon-lab-20261114/native-port-final/source/hermes_state.codon"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "\u001b[1m/home/pi/hermes-codon-lab-20261114/native-port-final/source/hermes_state.codon:9 (1-14): \u001b[1;31merror:\u001b[0m\u001b[1m no module named 'atexit'\u001b[0m\n",
+        "wall_s": 14.976064243819565
+      }
+    }
+  },
+  "target_headers": {
+    "command": [
+      "cc",
+      "-dM",
+      "-E",
+      "-include",
+      "errno.h",
+      "-x",
+      "c",
+      "/dev/null"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "wall_s": 0.07492785202339292,
+    "stdout_sha256": "53d6bd950375e9c6cf4542b4d6fbb7d937f84b2b92b6a5af05f774a231a1b600",
+    "selected_errno_defines": [
+      "#define EACCES 13",
+      "#define EINPROGRESS 115",
+      "#define EALREADY 114",
+      "#define EINTR 4",
+      "#define EDEADLK 35",
+      "#define ENOSPC 28",
+      "#define EISCONN 106",
+      "#define EWOULDBLOCK EAGAIN",
+      "#define EAGAIN 11"
+    ]
+  },
+  "errno_values": {
+    "EINTR": 4,
+    "EAGAIN": 11,
+    "EWOULDBLOCK": 11,
+    "EISCONN": 106,
+    "EALREADY": 114,
+    "EINPROGRESS": 115,
+    "EACCES": 13,
+    "EDEADLK": 35,
+    "ENOSPC": 28
+  },
+  "errno_shim_sha256": "a49d6d41f7161fba4c34bfd587c65aa3e761befd7ecfa6205b7f5edae00f6853",
+  "linux_fallback_adaptation": "Codon getattr(module, missing_attribute, default) fails statically; Linux has no WSAEWOULDBLOCK; specialize that known fallback to 10035 in native code",
+  "errno_addressed_natively": true,
+  "native_entrypoint_passed": false
+}

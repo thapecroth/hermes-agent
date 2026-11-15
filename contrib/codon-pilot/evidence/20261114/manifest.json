@@ -1,0 +1,24 @@
+{
+  "sha256": {
+    "README.md": "d8539d2f8894cb4ec6b4bbd2365dd7ba19aa70f07d2042f8c89dc8c3788799ca",
+    "baseline/profile.json": "58922dc1042bdae5de35c0635e00b2a5918022d75ae91fea126fcf61649c80a0",
+    "baseline/stage-summary.json": "dabbf8e5a695e8dd9c5ef19d50c101b1591de3ad9e0ad3394f5a9b7483d7010b",
+    "baseline/wall-flamegraph.svg": "35e5736455d36a6fb8df00e23d5af8a4cd36492b22384f55e359b465bfb88c9c",
+    "baseline-strict/profile.json": "bfad1323b7cd27ad197dc9a9207adc0dc5b53770c45d6658915117c0031df3b8",
+    "baseline-strict/stage-summary.json": "f53a2a5162a62720cf06b98828ba2f84f2e1435ded2318f778097a3660740f82",
+    "baseline-strict/wall-flamegraph.svg": "c227929cd105ce5c1fb3ad8f218dde0b8880e38d2e9f23e601f60a5750be13ba",
+    "compiler-rebuild.json": "9b85315a815ab68505db34cf89e4e492f73b1157c9a4c0b21d614f823929bb40",
+    "compiler-sigill.json": "0c40b67f20e8c5f0342616530981d8868ab7f0528244bdfa849f2521b5047cca",
+    "flamegraph-provenance.json": "736bd922dc06c2486a394db9292f1d8ea0365897c23885df915ee179223690c4",
+    "hybrid/profile.json": "5ad9b058794bc325ed26d1e2549547d297c0337aa82e8ac3a49c465d659e46d3",
+    "hybrid/stage-summary.json": "bf8b28842abc946eb5239d0abe7c158a9a61f63894d0e0240df3ca29fcab0e94",
+    "hybrid/wall-flamegraph.svg": "2af9ed80f1fec27507a0774d31b94592a950b65747f349dd600229242837c96d",
+    "hybrid-manager.json": "8700e38aa3ad067de2e9662dfe942b987b7806e79ab2f510dc06b66f714889ab",
+    "initial-attempt.json": "23711b9b8b3e6d9e4297c75313764f104fa1ca02bb281ba065a5ee9daa7f3119",
+    "locale-after.json": "c980e79fc9fe55f6da4b84cf4ee6aca2526d519b30ce4f6fdbd19ccc5c8c1428",
+    "locale-before.json": "239cb506e0a16d416b1e133cd04830c137a7def89404cf709e4a31fa3ddb7971",
+    "native-port.json": "81274b28de21ec9e3e78a87dbc39828c354f00d468e7d719538330fe3dc255b1",
+    "qualification.json": "13bd19d5f001d6680656c2324bdfcbfa65a4375c8c0d689b664f4dbb3ffa72a1",
+    "verification.json": "7860ed1222b76bf3b781e1f46e0ade92c05e40c688f69833c82b42cf672feeaf"
+  }
+}
