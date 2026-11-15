@@ -1,0 +1,19 @@
+{
+  "qualified_on": "2026-11-14",
+  "run_id": "run_4bd35ea06f654c42a5855c5c8b443be8",
+  "scenario": "Four independent official-documentation questions; user prompt did not request delegation",
+  "tool_calls": [
+    {
+      "name": "skill_view",
+      "tasks": 0
+    },
+    {
+      "name": "delegate_task",
+      "tasks": 4
+    }
+  ],
+  "completed_children": 4,
+  "failed_children": 0,
+  "first_research_action": "delegate_task",
+  "passed": true
+}

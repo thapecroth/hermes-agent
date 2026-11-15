@@ -23,6 +23,18 @@ retain a slot until restart. Browser sessions do not survive turns or gateway re
 The API budget covers the main turn API path, not auxiliary/background provider calls.
 The agent budget begins at a delegated child's first model request, not object construction.
 
+## Research instructions
+
+The plugin registers [research_prompt.md](../research_prompt.md) as a system prompt section.
+It defaults to search first and parallel delegation for independent questions, API-based
+retrieval, concise sourced findings, and prompt synthesis after asynchronous completion.
+It preserves the resource limits and the delegation tool's delivery contract.
+
+After editing that file, restart the gateway. Hermes freezes plugin prompt sections in
+each session's cached system prompt, including across restarts: the change applies to
+new sessions. In an existing Telegram chat, finish current work and use `/new` once to
+start a session with the new policy. Restarting alone does not rewrite cached conversations.
+
 ## Configuration
 
 Keep `delegation.max_concurrent_children: 10`, `max_spawn_depth: 1`, and

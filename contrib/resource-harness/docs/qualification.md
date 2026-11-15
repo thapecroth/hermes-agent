@@ -57,3 +57,17 @@ in an isolated environment containing its declared dev and ACP extras. Collectio
 in two existing ACP tests: the adapter imports `SetSessionModelResponse`, which is absent
 from the resolved `agent-client-protocol==0.12.1`. The full core suite did not pass. No core
 files were changed; the installed 0.22.2 plugin boundary was qualified by the separate E2E.
+
+## Search-first policy
+
+After installing `research_prompt.md`, the real plugin prompt renderer and session-freezing
+path returned its full 3,120 characters without truncation. All eight standalone tests still
+passed. A new authenticated gateway session received an ordinary request covering CSV,
+JSON, SQLite and HTTP documentation, with no instruction to delegate. Hermes loaded its
+required skill, then made `delegate_task` its first research action with all four topics
+in one batch. Durable completion reported four completed children and no failed children.
+See the [sanitized behavioral receipt](search-first-qualification-20261114.json).
+
+This checks one real routing decision; it is not a benchmark claiming a fixed latency
+improvement. Existing conversations retain their frozen prompts and need `/new` to adopt
+the updated policy.

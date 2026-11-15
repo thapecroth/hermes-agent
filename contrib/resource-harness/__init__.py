@@ -176,11 +176,5 @@ def register(ctx):
     ctx.register_middleware("llm_execution", llm_execution)
     ctx.register_middleware("tool_execution", tool_execution)
     ctx.register_hook("on_session_end", session_end)
-    ctx.register_system_prompt_section("resource-harness", (
-        "Research resource policy: up to ten API/search agents may run concurrently. "
-        "At most two agents hold browsers; additional browser work waits in the resource queue. "
-        "Prefer web search/extract APIs and reserve browser_exec for pages needing a browser. "
-        "Each agent has one isolated browser session for its turn, regardless of requested session names. "
-        "Save findings incrementally. Browser calls have a 120-second ceiling; split longer work. "
-        "Do not launch browser processes through terminal or execute_code to bypass the pool."
-    ))
+    ctx.register_system_prompt_section("resource-harness",
+        Path(__file__).with_name("research_prompt.md").read_text(encoding="utf-8"))

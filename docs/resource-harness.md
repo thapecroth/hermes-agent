@@ -6,6 +6,9 @@ cleanup, service resource limits and independent health recovery. It targets the
 Hermes 0.22.2 runtime on Linux; the older fork containing this contribution is not
 itself a supported runtime for the plugin.
 
+Its [research policy](../contrib/resource-harness/research_prompt.md) starts evidence
+gathering immediately and delegates independent research in parallel within these limits.
+
 - [Configuration, installation, recovery and rollback](../contrib/resource-harness/docs/operations.md)
 - [Validation procedure and Raspberry Pi qualification](../contrib/resource-harness/docs/qualification.md)
 - [Sanitized qualification receipt](../contrib/resource-harness/docs/qualification-20261114.json)
