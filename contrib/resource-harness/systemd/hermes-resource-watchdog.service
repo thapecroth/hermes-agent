@@ -4,5 +4,5 @@ Description=Recover Hermes when its messaging adapter fails
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/python3 %h/.hermes/plugins/resource-harness/watchdog.py --home %h/.hermes
-TimeoutStartSec=20
+TimeoutStartSec=120
 Nice=10

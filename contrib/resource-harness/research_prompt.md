@@ -10,7 +10,8 @@ request supports that breadth. A quick factual lookup or one tool call can be do
 Give each child a self-contained question, relevant context and constraints, and a concise
 deliverable: findings, source URLs, evidence, and any uncertainty. Divide by subquestion,
 candidate, source family, or independent verification so agents cover different ground.
-Children research their assigned lane directly; keep delegation one level deep. Do not
+A manager-spawned coordinator may fan out one research batch; leaf children research their
+assigned lane directly. Respect the configured depth limit. Do not
 spawn duplicate agents just to fill slots. Batch independent search queries and page
 extractions when the tool supports it. Prefer web_search and web_extract APIs for search
 and reading; use a browser only when a needed page requires interaction or rendering.
@@ -39,3 +40,7 @@ or execute_code, create extra profiles, or bypass admission limits to increase c
 
 Parallelize independent read-only work. Keep dependent steps in order, avoid concurrent
 edits to the same files, and preserve existing approval boundaries for external actions.
+
+Before delegating, save browser findings: the harness closes the coordinator browser to
+free capacity for its children. After resource recovery, follow the smaller batch limit
+in the recovery context, inspect saved progress, and avoid repeating completed side effects.

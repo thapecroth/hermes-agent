@@ -57,6 +57,26 @@ class Harness:
                 self.owners.pop(owner, None)
             return True
 
+    def release_browser(self, owner, cleanup):
+        """A coordinator must not hold browser capacity while waiting for its children."""
+        with self.owner_lock(owner):
+            with self.mutex:
+                lease = self.owners.get(owner, {}).get("browser")
+            if lease is None:
+                return True
+            try:
+                cleanup(browser_name(owner))
+            except Exception as exc:
+                self.root.joinpath("cleanup-failed").write_text(type(exc).__name__, encoding="utf-8")
+                log.exception("Browser cleanup failed before delegation; retaining its slot")
+                return False
+            lease.close()
+            with self.mutex:
+                self.owners[owner].pop("browser", None)
+                if not self.owners[owner]:
+                    self.owners.pop(owner)
+            return True
+
 
 def browser_name(owner):
     return "rh-" + hashlib.sha256(owner.encode()).hexdigest()[:32]
@@ -121,11 +141,16 @@ def register(ctx):
 
     def tool_execution(*, tool_name, args, next_call, session_id="", task_id="", turn_id="", **_):
         search = tool_name in ("web_search", "web_extract")
-        if not search and not tool_name.startswith("browser_"):
+        spawning = tool_name == "delegate_task" and (args.get("action") or "spawn") == "spawn"
+        if not search and not spawning and not tool_name.startswith("browser_"):
             return next_call(args)
         from tools.registry import tool_error
         from tools.interrupt import is_interrupted
         owner = owner_key(session_id, task_id, turn_id)
+        if spawning:
+            if owner and not current().release_browser(owner, lambda name: cleanup_browser(name, task_id)):
+                return tool_error("Browser cleanup failed before delegation; recovery is required")
+            return next_call(args)
         if search:
             try:
                 h = current()
@@ -178,3 +203,7 @@ def register(ctx):
     ctx.register_hook("on_session_end", session_end)
     ctx.register_system_prompt_section("resource-harness",
         Path(__file__).with_name("research_prompt.md").read_text(encoding="utf-8"))
+    # Opt-in consumption happens after gateway authorization and releases the main chat
+    # immediately. Disabled by default for existing standalone harness installations.
+    from .manager_runtime import register_manager
+    register_manager(ctx)

@@ -86,6 +86,33 @@ class HarnessTests(unittest.TestCase):
         self.assertTrue((self.root / "cleanup-failed").exists())
         h.release("broken", lambda _: None)
 
+    def test_coordinator_releases_browser_but_keeps_agent_slot(self):
+        h = harness.Harness(self.root, browsers=2, wait=0)
+        for owner in ("coordinator-one", "coordinator-two"):
+            h.retain("agents", owner)
+            h.retain("browser", owner)
+        cleaned = []
+        self.assertTrue(h.release_browser("coordinator-one", cleaned.append))
+        self.assertEqual(cleaned, [harness.browser_name("coordinator-one")])
+        self.assertEqual(len(occupied(self.root)["agents"]), 2)
+        h.retain("browser", "nested-child")
+        for owner in ("coordinator-one", "coordinator-two", "nested-child"):
+            h.release(owner, lambda _: None)
+        self.assertFalse(any(occupied(self.root).values()))
+
+    def test_failed_coordinator_cleanup_keeps_browser_and_agent_quarantined(self):
+        h = harness.Harness(self.root, browsers=1, wait=0)
+        h.retain("agents", "coordinator")
+        h.retain("browser", "coordinator")
+        def fail(_):
+            raise RuntimeError("fixture cleanup failure")
+        with self.assertLogs(harness.log, level="ERROR"):
+            self.assertFalse(h.release_browser("coordinator", fail))
+        self.assertEqual(len(occupied(self.root)["agents"]), 1)
+        with self.assertRaises(CapacityTimeout):
+            h.retain("browser", "child")
+        h.release("coordinator", lambda _: None)
+
     def test_process_crash_releases_file_lock(self):
         ctx = multiprocessing.get_context("fork")
         ready, release = ctx.Event(), ctx.Event()

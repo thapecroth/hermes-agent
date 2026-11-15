@@ -11,4 +11,6 @@ gathering immediately and delegates independent research in parallel within thes
 
 - [Configuration, installation, recovery and rollback](../contrib/resource-harness/docs/operations.md)
 - [Validation procedure and Raspberry Pi qualification](../contrib/resource-harness/docs/qualification.md)
-- [Sanitized qualification receipt](../contrib/resource-harness/docs/qualification-20261114.json)
+- [Original sanitized qualification receipt](../contrib/resource-harness/docs/qualification-20261114.json)
+- [Always-available Telegram manager and automatic resource recovery](../contrib/resource-harness/docs/telegram-manager.md)
+- [Manager, browser and recovery qualification receipt](../contrib/resource-harness/docs/manager-qualification-20261114.json)

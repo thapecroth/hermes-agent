@@ -15,7 +15,9 @@ owners can work concurrently; further owners wait without blocking the gateway e
 API/search work has a separate budget. Releasing a slot closes both its browser-harness
 daemon and the managed browser, including a hybrid local sidecar. Failed cleanup retains
 the slot and signals the independent watchdog; it cannot admit a replacement over a browser
-that may still be alive. A browser tool error also initiates cleanup.
+that may still be alive. A browser tool error also initiates cleanup. Before spawning
+children, a coordinator closes its browser and releases that browser slot while retaining
+its agent slot; otherwise two waiting coordinators could block all browser children.
 
 The harness controls Hermes tool dispatch, not arbitrary OS commands: an agent using
 terminal/execute_code to start its own browser bypasses this policy. A frozen worker can
@@ -37,7 +39,7 @@ start a session with the new policy. Restarting alone does not rewrite cached co
 
 ## Configuration
 
-Keep `delegation.max_concurrent_children: 10`, `max_spawn_depth: 1`, and
+Keep `delegation.max_concurrent_children: 10`, `max_spawn_depth: 2`, `orchestrator_enabled: true`, and
 `child_timeout_seconds: 600` in `config.yaml`. The latter is an inactivity timeout.
 Use `browser.backend: browser-use` with the managed local browser. The plugin rejects
 legacy `browser_*` tools rather than admitting a second unaccounted browser path.
@@ -52,6 +54,8 @@ plugins:
         agents: 10
         api: 10
         browsers: 2
+        telegram_manager: true
+        manager_jobs: 3
         queue_timeout_seconds: 600
         browser_timeout_seconds: 120
 ```
@@ -76,7 +80,10 @@ restart the gateway after the update and repeat qualification.
 
 The watchdog checks every 45 seconds. It preserves a manually stopped gateway, gives startup
 three minutes, and requires two consecutive unhealthy observations. It restarts on a fatal
-platform state, failed HTTP health, stale process identity, or failed browser cleanup.
+platform state, failed HTTP health, stale process identity, failed browser cleanup, or
+sustained cgroup memory/task usage of at least 90% of the actual limit. CPU load alone
+is not a restart reason. Its restart ticket lets the manager resume saved work automatically
+with a resource warning and smaller batches; see [Telegram manager](telegram-manager.md).
 It allows at most three restarts per half-hour, spaced at least five minutes apart.
 The service restart can interrupt active work; save research findings incrementally.
 

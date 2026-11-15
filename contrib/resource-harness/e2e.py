@@ -195,10 +195,50 @@ def main():
                        for name in browser_names), "a browser harness daemon survived"
             with browser_tool._cleanup_lock:
                 assert not browser_tool._active_sessions, "a managed browser survived"
+            # Reproduce two browser-owning coordinators delegating browser children.
+            # Middleware must close each parent's browser before dispatch, retaining
+            # its agent lease, so children can make progress within the same two slots.
+            from agent.delegation_context import delegated_child_context
+            from hermes_cli.middleware import run_tool_execution_middleware
+            coordinators = [f"{run}-coordinator-{n}" for n in range(2)]
+            def open_browser(sid):
+                value = model_tools.handle_function_call("browser_exec", {
+                    "code": f'new_tab({base!r}); wait_for_load(); print(js("document.title"))', "timeout_s": 90},
+                    session_id=sid, task_id=sid, turn_id="nested-turn")
+                value = json.loads(value) if isinstance(value, str) else value
+                assert value.get("success"), value
+                browser_names.append(value["session"])
+            for sid in coordinators:
+                with delegated_child_context():
+                    run_llm_execution_middleware({}, lambda _: "coordinator", session_id=sid, task_id=sid, turn_id="nested-turn")
+                open_browser(sid)
+            assert len(pools.occupied(pool_root)["browser"]) == 2
+            for sid in coordinators:
+                def child(_args, parent=sid):
+                    state = pools.occupied(pool_root)
+                    assert any(item["owner"] == parent + ":nested-turn" for item in state["agents"]), state
+                    assert not any(item["owner"] == parent + ":nested-turn" for item in state["browser"]), state
+                    child_sid = parent + "-child"
+                    try:
+                        open_browser(child_sid)
+                    finally:
+                        invoke_hook("on_session_end", session_id=child_sid, task_id=child_sid, turn_id="nested-turn")
+                    return "child completed"
+                try:
+                    assert run_tool_execution_middleware("delegate_task", {"goal": "nested fixture"}, child,
+                        session_id=sid, task_id=sid, turn_id="nested-turn") == "child completed"
+                finally:
+                    invoke_hook("on_session_end", session_id=sid, task_id=sid, turn_id="nested-turn")
+            deadline = time.monotonic() + 90
+            while any(pools.occupied(pool_root).values()):
+                assert time.monotonic() < deadline, "nested browser leases survived cleanup"
+                stop_sampler.wait(.1)
+            assert all(not daemon_alive(name) and not daemon_alive(_sidecar_daemon_name(name)) for name in browser_names)
             assert not failures, failures
             assert peak["api"] == 10 and peak["browser"] == 2 and peak["managed_browsers"] <= 2, peak
             receipt = {"run": run, "passed": True, "peak": peak,
                        "api_requests": 10, "real_browser_jobs": 4,
+                       "nested_coordinators": 2, "nested_browser_children": 2,
                        "remaining_leases": pools.occupied(pool_root), "remaining_browser_daemons": 0,
                        "uses_real_model_provider": False}
             artifact.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")

@@ -1,0 +1,134 @@
+{
+  "qualified_on": "2026-11-14",
+  "hermes_version": "0.22.2",
+  "standalone_tests": 47,
+  "manager_e2e": {
+    "passed": true,
+    "real_hermes_admission_and_delegation": true,
+    "provider": "deterministic fixture",
+    "telegram_delivery": "captured adapter; no external sends",
+    "early_discovery_bootstrap_before_intake": true,
+    "jobs": [
+      {
+        "id": 1,
+        "state": "completed"
+      },
+      {
+        "id": 2,
+        "state": "cancelled"
+      },
+      {
+        "id": 3,
+        "state": "completed"
+      }
+    ],
+    "latency_seconds": {
+      "first": 0.137,
+      "while_worker_running": 0.028,
+      "status": 0.033
+    },
+    "steering_applied": true,
+    "selected_cancellation": true,
+    "approval_isolation": true,
+    "media_delegated": true,
+    "deduplication": true,
+    "main_agent_calls": 0,
+    "remaining_leases": {
+      "agents": [],
+      "api": [],
+      "browser": []
+    }
+  },
+  "live_provider_canary": {
+    "passed": true,
+    "uses_real_model_provider": true,
+    "model": "gpt-6.1-sol",
+    "routing_decisions": [
+      {
+        "action": "new",
+        "target": null
+      },
+      {
+        "action": "steer",
+        "target": 1
+      },
+      {
+        "action": "cancel",
+        "target": 2
+      }
+    ],
+    "real_delegated_worker_completed": true,
+    "external_message_sends": 0,
+    "transcript_isolated": true
+  },
+  "resource_recovery_e2e": {
+    "passed": true,
+    "manual_stop_preserved": true,
+    "trigger": "real cgroup memory with deliberately low test threshold",
+    "automatic_resume_attempt": 1,
+    "worker_warning_received": true,
+    "user_warning_delivered": true,
+    "side_effect_count": 1,
+    "restart_noop_rejected": true,
+    "recovery_bound_to_replacement_invocation": true,
+    "systemd_resource_exit_resume": true,
+    "resource_result_injected": true,
+    "manual_restart_did_not_resume_resource_ticket": true
+  },
+  "browser_api_e2e": {
+    "run": "rh-e2e-d71af7399800",
+    "passed": true,
+    "peak": {
+      "api": 10,
+      "browser": 2,
+      "managed_browsers": 2
+    },
+    "api_requests": 10,
+    "real_browser_jobs": 4,
+    "nested_coordinators": 2,
+    "nested_browser_children": 2,
+    "remaining_leases": {
+      "agents": [],
+      "api": [],
+      "browser": []
+    },
+    "remaining_browser_daemons": 0,
+    "uses_real_model_provider": false
+  },
+  "deployed_gateway": {
+    "passed": true,
+    "unit": {
+      "NRestarts": "0",
+      "OOMPolicy": "kill",
+      "MemoryMax": "5368709120",
+      "TasksMax": "1024",
+      "ActiveState": "active"
+    },
+    "gateway_state": "running",
+    "platforms": {
+      "telegram": "connected",
+      "api_server": "connected",
+      "photon": "connected"
+    },
+    "health": "ok",
+    "manager_heartbeat_advances": true,
+    "watchdog_timer": "active",
+    "limits": {
+      "agents": 10,
+      "api": 10,
+      "browsers": 2,
+      "manager_jobs": 3
+    },
+    "delegation_depth": 2,
+    "remaining_leases": {
+      "agents": [],
+      "api": [],
+      "browser": []
+    },
+    "browser": {
+      "backend": "browser-use",
+      "engine": "auto",
+      "cloud_provider": "local"
+    }
+  }
+}

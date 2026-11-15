@@ -80,3 +80,47 @@ all leases and harness daemons were gone afterward.
 This checks one real routing decision; it is not a benchmark claiming a fixed latency
 improvement. Existing conversations retain their frozen prompts and need `/new` to adopt
 the updated policy.
+
+## Telegram manager and resource continuation
+
+The expanded standalone suite passed 47 tests. The actual Hermes admission/delegation
+E2E passed with captured Telegram delivery: an early-discovered plugin bootstrapped its
+scheduler before any message, independent jobs ran together, steering reached the live
+child, selected cancellation left its sibling running, consent remained job/request/chat
+scoped, media reached workers, duplicate intake did not replay jobs, and all leases cleared.
+The fixture's latest receipt latencies were 137 ms initially, 28 ms with another worker
+running, and 33 ms for status. They exclude Telegram's external network and are not a
+production latency promise. The main conversation made zero agent calls.
+
+A separate configured-provider canary using `gpt-6.1-sol` correctly classified new work,
+steering and selected cancellation, then completed a real delegated worker. It isolated
+its transcript and sent no external messages.
+
+The real systemd E2E used a disposable unit and actual cgroup readings with a deliberately
+low test threshold. Two pressure observations replaced the process, resumed saved work,
+delivered both warnings to local sinks, and left the completed side effect count at one.
+Restart issuance was tied to the observed replacement PID/invocation; a successful
+`try-restart` no-op after a manual stop was rejected. A second phase injected the resource
+failure result label into `ExecStopPost`, then verified a real `Restart=on-failure`
+transition and automatic continuation. A later successful stop invalidated an outstanding
+resource ticket, and a manual start did not replay it. No actual OOM was induced. Fixture
+process and temporary unit cleanup were independently verified.
+
+The browser/API E2E still measured ten overlapping HTTP calls and at most two browser
+owners/managed Chromium processes. Four ordinary browser jobs and two browser-owning
+coordinators with browser children completed without deadlock or remaining leases/daemons.
+See the [sanitized combined receipt](manager-qualification-20261114.json).
+
+The broader upstream suite was attempted again but did not pass: before stopping the
+resource-heavy run it reported 11,180 passed, 66 failed, 32 errors and 97 skipped. The
+resolved environment includes existing ACP import incompatibility and missing optional
+FastAPI dependencies, alongside other upstream failures. The focused contribution checks
+and installed-runtime E2Es passed; neither the full suite nor hosted CI is claimed green.
+
+The final plugin was deployed to the Pi after an idle drain, with a private rollback
+backup. Live qualification verified an advancing manager heartbeat belonging to the
+new gateway PID, connected Telegram/API/Photon adapters, healthy HTTP, an active watchdog
+timer, effective `OOMPolicy=kill`, 5 GiB memory maximum and 1,024 tasks, the 10/10/2 budgets,
+three top-level manager jobs, delegation depth two, and empty resource pools. Browser
+configuration remains local. No unsolicited Telegram test message was sent; external
+Telegram message delivery remains unqualified by these captured-adapter tests.

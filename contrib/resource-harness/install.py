@@ -30,10 +30,12 @@ def main():
         enabled.append("resource-harness")
     plugins.setdefault("entries", {}).setdefault("resource-harness", {})["settings"] = {
         "agents": 10, "api": 10, "browsers": 2,
+        "telegram_manager": True, "manager_jobs": 3,
         "queue_timeout_seconds": 240, "browser_timeout_seconds": 120}
     config.setdefault("browser", {})["backend"] = "browser-use"
     config.setdefault("delegation", {})["max_concurrent_children"] = 10
-    config["delegation"]["max_spawn_depth"] = 1
+    config["delegation"]["max_spawn_depth"] = 2
+    config["delegation"]["orchestrator_enabled"] = True
     config["delegation"]["child_timeout_seconds"] = 600
     if "resource-harness" in plugins.get("disabled", []):
         plugins["disabled"].remove("resource-harness")
