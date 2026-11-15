@@ -3,7 +3,7 @@
   "whole_stack_native": false,
   "focused_checks": {
     "local_evidence_tests": {
-      "passed": 3
+      "passed": 4
     },
     "actual_pi_locale_tests": {
       "passed": 5
@@ -73,5 +73,6 @@
     "Sampler rates, host load and provider latency differ",
     "Browser subprocess CPU excluded",
     "No external Telegram test message sent"
-  ]
+  ],
+  "cache_dependency_regression": "Modified and newly added native dependency modules invalidate resume evidence"
 }

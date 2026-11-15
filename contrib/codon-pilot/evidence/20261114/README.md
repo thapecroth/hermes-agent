@@ -19,7 +19,7 @@ The production service still uses its Python launcher.
 | [manifest.json](manifest.json) | SHA-256 of captured receipts and graph artifacts. |
 | [verification.json](verification.json) | Focused checks, E2E scope, native limits, profiler metadata, production status and full upstream-suite result. |
 
-Focused checks additionally passed: three local evidence-accounting tests and
+Focused checks additionally passed: four local evidence-accounting tests and
 five tests against the installed Pi's actual locale code. An unpatched test first
 reproduced three catalog parses instead of one. No full-native Hermes success is
 claimed. Both research E2Es passed all per-job checks, but their elapsed times

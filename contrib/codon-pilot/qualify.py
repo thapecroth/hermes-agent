@@ -93,6 +93,15 @@ def file_hash(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+def source_tree_hash(root):
+    digest = hashlib.sha256()
+    for path in sorted(Path(root).rglob('*.codon')):
+        digest.update(str(path.relative_to(root)).encode() + b'\0')
+        digest.update(path.read_bytes())
+        digest.update(b'\0')
+    return digest.hexdigest()
+
+
 def probe_fingerprint(source, toolchain):
     return hashlib.sha256(json.dumps({'source': source, 'toolchain': toolchain},
                                     sort_keys=True).encode()).hexdigest()
@@ -172,7 +181,10 @@ def main():
                CODON_PATH=str(view), OMP_NUM_THREADS='1', OPENBLAS_NUM_THREADS='1')
     sdk_libraries = args.codon.resolve().parent.parent / 'lib/codon'
     toolchain = {'compiler': file_hash(args.codon), 'python_library': file_hash(args.python_library),
+                 'compiler_path': str(args.codon), 'python_library_path': str(args.python_library),
                  'cpu': args.cpu, 'flags': ['build', '-release'],
+                 'sdk_stdlib': source_tree_hash(sdk_libraries / 'stdlib'),
+                 'native_source': source_tree_hash(view),
                  'sdk': {p.name: file_hash(p) for p in sorted(sdk_libraries.glob('*.so'))}}
     # Build native CLI directly before testing feature-specific blockers.
     previous = {}

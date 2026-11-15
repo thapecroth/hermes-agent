@@ -118,7 +118,7 @@ no external sends. The manager accepted a second instruction in 0.045 seconds
 while a worker was running, and returned status in 0.073 seconds. Its provider
 is a deterministic fixture; the separate research E2E uses the real provider.
 
-Eight focused tests passed (three evidence-accounting checks and five against
+Nine focused tests passed (four evidence-accounting checks and five against
 the Pi's actual locale implementation). The required full fork-core suite also
 ran: **11,819 passed, 68 failed, 46 errors, 97 skipped**, in 142.40 seconds.
 Failures include ACP dependency/API mismatches and missing optional FastAPI in

@@ -34,7 +34,9 @@ Run builds, tests and profiles sequentially on the Pi.
    probes, the actual native entrypoint failure, a hybrid build and CLI checks.
    The second generates native errno constants from the target's C headers and
    attempts additional actual Hermes source units. `--resume` on `qualify.py`
-   requires matching source/toolchain fingerprints and executable content.
+   requires matching source, imported native-source/SDK-stdlib trees,
+   compiler/library fingerprints and executable content. Successful reused
+   binaries are executed again.
 3. Keep `runtime_compat.py` beside the generated `hermes-codon` executable. It
    serializes cold catalog builds and invalidation while preserving user-home,
    overlay and plugin semantics. It installs before worker/plugin discovery.

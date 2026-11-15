@@ -3,11 +3,25 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from qualify import file_hash, probe_fingerprint, probe_reusable
+from qualify import file_hash, probe_fingerprint, probe_reusable, source_tree_hash
 from render_profile import union
 
 
 class EvidenceTests(unittest.TestCase):
+    def test_resume_rejects_modified_or_added_imported_source(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            dependency = root / 'contextvars.codon'
+            dependency.write_text('value = 1\n')
+            original = {'sdk_stdlib': source_tree_hash(root)}
+            old = {'fingerprint': probe_fingerprint('source', original), 'build': {'returncode': 1}}
+            self.assertTrue(probe_reusable(old, 'source', original, root / 'binary'))
+            dependency.write_text('value = 2\n')
+            self.assertFalse(probe_reusable(old, 'source', {'sdk_stdlib': source_tree_hash(root)}, root / 'binary'))
+            dependency.write_text('value = 1\n')
+            (root / 'new_module.codon').write_text('value = 3\n')
+            self.assertFalse(probe_reusable(old, 'source', {'sdk_stdlib': source_tree_hash(root)}, root / 'binary'))
+
     def test_resume_rejects_overwritten_source_changed_compiler_or_binary(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
