@@ -130,6 +130,8 @@ def cleanup_browser(name, task_id="default"):
         raise RuntimeError("Browser teardown or independent verification failed: " +
                            "; ".join(str(error) for error in errors)) from errors[0]
     forget_verified(name)
+    from hermes_constants import get_hermes_home
+    (get_hermes_home() / "runtime/resource-harness/auth" / (name.removeprefix("rh-") + ".ready")).unlink(missing_ok=True)
 
 
 def register(ctx):
@@ -174,6 +176,29 @@ def register(ctx):
             return next_call(request)
 
     def tool_execution(*, tool_name, args, next_call, session_id="", task_id="", turn_id="", **_):
+        if tool_name == "interactive_browser":
+            from tools.registry import tool_error
+            identity = session_id or task_id or "agent"
+            owner = owner_key(session_id, task_id, turn_id)
+            h = current()
+            with h.owner_lock(owner):
+                with h.mutex:
+                    headless = "browser" in h.owners.get(owner, {})
+                if args.get("action") == "open" and headless:
+                    from tools.browser_use_cli import browser_exec
+                    from .browser_auth import wrap_code
+                    # Use the existing daemon's connection, then prove it has
+                    # stopped before the rendered worker takes admission.
+                    code = wrap_code("print('Authentication checkpoint saved')", home=get_hermes_home(),
+                                     identity=identity, owner=owner)
+                    checkpoint = browser_exec(code, session=browser_name(owner),
+                                              timeout_s=h.browser_timeout, task_id=task_id)
+                    checkpoint = json.loads(checkpoint) if isinstance(checkpoint, str) else checkpoint
+                    if not isinstance(checkpoint, dict) or not checkpoint.get("success"):
+                        return tool_error("Could not checkpoint the research session before switching engines")
+                    if not h.release_browser(owner, lambda name: cleanup_browser(name, task_id)):
+                        return tool_error("Rendered browser needs research cleanup; recovery is required")
+                return next_call({**args, "_harness_identity": identity})
         search = tool_name in ("web_search", "web_extract")
         spawning = tool_name == "delegate_task" and (args.get("action") or "spawn") == "spawn"
         if not search and not spawning and not tool_name.startswith("browser_"):
@@ -195,6 +220,11 @@ def register(ctx):
                 return next_call(args)
         if not owner:
             return tool_error("Browser admission requires a session or task identity")
+        if ctx.get_config("interactive_browser", False):
+            from .interactive_browser import runtime_dir
+            active = runtime_dir(get_hermes_home()) / "owner.json"
+            if active.exists() and read_private_owner(active) == (session_id or task_id):
+                return tool_error("This job has moved to Bot Screen. Use interactive_browser inspect/fill/click/press; human takeover pauses automation.")
         try:
             from .browser_cleanup import shared_endpoint_configured
             if shared_endpoint_configured():
@@ -208,6 +238,10 @@ def register(ctx):
                 return tool_error("This harness supports browser_exec; use the configured browser-use backend")
             routed = dict(args)
             routed["session"] = browser_name(owner)
+            if ctx.get_config("browser_auth", False):
+                from .browser_auth import wrap_code
+                routed["code"] = wrap_code(routed.get("code", ""), home=get_hermes_home(),
+                    identity=session_id or task_id, owner=owner)
             requested = routed.get("timeout_s", h.browser_timeout)
             try:
                 routed["timeout_s"] = min(h.browser_timeout, max(10, int(requested)))
@@ -234,9 +268,24 @@ def register(ctx):
                 decoded = json.loads(result) if isinstance(result, str) else result
                 failed = isinstance(decoded, dict) and (decoded.get("error") or decoded.get("success") is False)
             except ValueError:
+                decoded = None
                 failed = False
             if failed:
                 h.release(owner, lambda name: cleanup_browser(name, task_id))
+            if ctx.get_config("interactive_browser", False):
+                from .browser_auth import owner_marker
+                challenge = owner_marker(get_hermes_home(), owner).with_suffix(".challenge")
+                if challenge.exists():
+                    data = json.loads(challenge.read_text())
+                    challenge.unlink()
+                    if not h.release_browser(owner, lambda name: cleanup_browser(name, task_id)):
+                        return tool_error("Rendered fallback needs browser cleanup; recovery is required")
+                    from .interactive_browser import request
+                    fallback = request(get_hermes_home(), "open", identity=session_id or task_id, url=data["url"])
+                    if isinstance(decoded, dict):
+                        decoded["rendered_fallback"] = fallback
+                        decoded["next_step"] = "Use interactive_browser. The same rendered session is visible in dashboard Bot Screen for human takeover."
+                        result = json.dumps(decoded)
             return result
 
     def session_end(*, session_id="", task_id="", turn_id="", **_):
@@ -259,3 +308,19 @@ def register(ctx):
     # immediately. Disabled by default for existing standalone harness installations.
     from .manager_runtime import register_manager
     register_manager(ctx)
+    if ctx.get_config("interactive_browser", False):
+        from .interactive_browser import register_interactive
+        register_interactive(ctx)
+
+
+def read_private_owner(path):
+    # Contains only the owner identity, never browser credentials.
+    try:
+        import psutil
+        data = json.loads(path.read_text())
+        process = psutil.Process(data["pid"])
+        if process.status() == psutil.STATUS_ZOMBIE or abs(process.create_time() - data["born"]) > .01:
+            return None
+        return data.get("identity")
+    except (OSError, ValueError, KeyError, psutil.Error):
+        return None

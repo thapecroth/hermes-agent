@@ -1,0 +1,11 @@
+{
+  "name": "resource-harness",
+  "label": "Bot Screen",
+  "description": "Live browser rendering, human takeover and bounded local sessions.",
+  "icon": "monitor",
+  "version": "0.4.0",
+  "tab": {"path": "/bot-screen", "position": "end"},
+  "entry": "dist/index.js",
+  "css": "src/screen.css",
+  "api": "api.py"
+}

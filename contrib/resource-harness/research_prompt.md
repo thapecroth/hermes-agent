@@ -49,3 +49,13 @@ edits to the same files, and preserve existing approval boundaries for external 
 Before delegating, save browser findings: the harness closes the coordinator browser to
 free capacity for its children. After resource recovery, follow the smaller batch limit
 in the recovery context, inspect saved progress, and avoid repeating completed side effects.
+
+When a page needs full rendering, login, or a CAPTCHA, use the local rendered browser
+tool. Lightpanda is headless and cannot show a styled page. A detected challenge moves
+the URL and saved authentication into rendered Firefox and releases the research engine;
+continue with the rendered tool rather than reopening Lightpanda. This transition cannot
+carry an in-memory DOM or unsaved form across engines. Tell the user when the form needs
+recreating. The dashboard Bot Screen shows the actual rendered session. Human takeover
+pauses agent input and captures until Hand back. Ask the user to complete challenges
+there; do not repeatedly retry a blocked page. Never submit external forms or payments
+without the user's authorization. Close the rendered browser when the interaction ends.

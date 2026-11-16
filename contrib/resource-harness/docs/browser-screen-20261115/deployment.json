@@ -1,0 +1,46 @@
+{
+  "gateway_state": "running",
+  "platforms": {
+    "telegram": {
+      "state": "connected",
+      "has_error": false
+    },
+    "api_server": {
+      "state": "connected",
+      "has_error": false
+    },
+    "photon": {
+      "state": "connected",
+      "has_error": false
+    }
+  },
+  "limits": {
+    "agents": 10,
+    "api": 10,
+    "browsers": 2,
+    "manager_jobs": 3
+  },
+  "engine": "lightpanda",
+  "shared_cdp_configured": false,
+  "real_profile": false,
+  "desktop_placement": "gateway",
+  "snapshot_mode": "0o600",
+  "occupied": {
+    "agents": [],
+    "api": [],
+    "browser": []
+  },
+  "manager_states": {
+    "completed": 73,
+    "failed": 1
+  },
+  "rendered_owner_present": false,
+  "rendered_processes": [],
+  "dashboard_loopback_only": true,
+  "api_health": {
+    "status": "ok",
+    "platform": "hermes-agent",
+    "version": "0.22.2"
+  },
+  "local_manifest_matches": true
+}

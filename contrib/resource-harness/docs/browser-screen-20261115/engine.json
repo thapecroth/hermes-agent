@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "local_only": true,
+  "engines": [
+    "lightpanda",
+    "oss-invisible Firefox"
+  ],
+  "real_browser_use_auth": true,
+  "new_tab_auth": true,
+  "logout_and_exception_survive_restart": true,
+  "automatic_fallback": true,
+  "two_browser_cap": true,
+  "job_isolation": true,
+  "native_human_fence": true,
+  "rendered_js_form_and_auth": true,
+  "immediate_close_reopen_cleanup": true,
+  "rendered_restart_auth": true,
+  "pending_origin_logout_does_not_restore_stale_auth": true,
+  "worker_crash_reaped_before_admission_released": true,
+  "worker_crash_recovery": true,
+  "explicit_migration_releases_lightpanda": true,
+  "redirect_imports_destination_and_preserves_unvisited_origin": true,
+  "token_refresh_and_immediate_reload": true,
+  "remaining_browser_leases": 0
+}

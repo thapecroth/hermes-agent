@@ -11,3 +11,6 @@ See [Lightpanda installation and performance qualification](../../docs/browser-p
 for the pinned ARM64 runtime, session reuse, cleanup checks, and controlled comparisons.
 
 See [Telegram jobs and resource recovery](docs/telegram-manager.md).
+
+See [Bot Screen and local rendered fallback](../../docs/browser-screen.md) for
+persistent auth, live forms, human takeover and the pinned ARM64 Firefox adapter.
