@@ -1,0 +1,10 @@
+{
+  "locale_singleflight": true,
+  "cold_workers": 3,
+  "wall_s": 1.8970446579623967,
+  "process_cpu_s": 1.8161272149999999,
+  "bundled_parse_calls": 1,
+  "catalog_entries": 3433,
+  "equivalent_catalogs": true,
+  "shared_result": true
+}

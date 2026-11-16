@@ -1,0 +1,30 @@
+{
+  "command": [
+    "g++",
+    "-std=c++20",
+    "-O2",
+    "-march=armv8-a",
+    "-mtune=cortex-a72",
+    "-moutline-atomics",
+    "-D_GLIBCXX_USE_CXX11_ABI=0",
+    "-DFMT_HEADER_ONLY",
+    "-I/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/include",
+    "/home/pi/hermes-codon-lab-20261114/main.cpp",
+    "-L/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/lib/codon",
+    "-Wl,-rpath,$ORIGIN/../lib/codon",
+    "-Wl,-rpath-link,/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/lib/codon",
+    "-lcodonc",
+    "-lcodon_jupyter",
+    "-lcodonrt",
+    "-pthread",
+    "-ldl",
+    "-lrt",
+    "-latomic",
+    "-o",
+    "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72"
+  ],
+  "returncode": 0,
+  "stdout": "",
+  "stderr": "",
+  "wall_s": 116.6306862779893
+}

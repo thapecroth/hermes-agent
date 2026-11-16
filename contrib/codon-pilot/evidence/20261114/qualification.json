@@ -1,0 +1,404 @@
+{
+  "whole_stack_native": false,
+  "toolchain": {
+    "compiler": "979981d97caf51e9171f515af4b6540c2bed3f367ced41ce278c3e4963463365",
+    "python_library": "e05ae9fd012fdec97cbee955b589ed3f035dcc00414a3510c568df8655217b71",
+    "cpu": "cortex-a72",
+    "flags": [
+      "build",
+      "-release"
+    ],
+    "sdk": {
+      "libcodon_jupyter.so": "1b0101a082410f71cf0da14b74f6aa2b2cc4fcd48999c15c37fb28a30c15a6ef",
+      "libcodonc.so": "849d7b782f0039e385a83bb9f7429ee9f6c84287f18955d60f90c5c19692eda7",
+      "libcodonrt.so": "15acba48137e3bd04e41f1c18bba896fe7fe5be3c62f90f7ce38ba536dd6e513",
+      "libomp.so": "f21b22213a8b25182e9470dbd4df09d0c04e3b53d4e1e17fbabfbf16124b909b"
+    }
+  },
+  "probes": {
+    "native_hello": {
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/qualification/native_hello",
+          "/home/pi/hermes-codon-lab-20261114/qualification/probe_native_hello.codon"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": "",
+        "wall_s": 13.333750740159303
+      },
+      "execution": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/qualification/native_hello"
+        ],
+        "returncode": 0,
+        "stdout": "7\n",
+        "stderr": "",
+        "wall_s": 0.014321026857942343
+      },
+      "semantics_passed": true,
+      "fingerprint": "014fe5ac831dfd3904c18a0f6c63466862e1728d87e3961a04aba950acac9384",
+      "executable_sha256": "216b5a778fe49aed035dd0e698830a96d1c0a66ff1dded1943c8cf747274f153",
+      "reused_unchanged_probe": true
+    },
+    "dynamic_fields": {
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/qualification/dynamic_fields",
+          "/home/pi/hermes-codon-lab-20261114/qualification/probe_dynamic_fields.codon"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "\u001b[1m/home/pi/hermes-codon-lab-20261114/qualification/probe_dynamic_fields.codon:6 (16-20): \u001b[1;31merror:\u001b[0m\u001b[1m expected static expression\u001b[0m\n",
+        "wall_s": 11.882001783931628
+      },
+      "fingerprint": "d64c66ce2636cb3a8582a21acef3bb809508d0e868e8437ea0d8dcd53ee4a79d",
+      "reused_unchanged_probe": true
+    },
+    "declared_fields_fix": {
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/qualification/declared_fields_fix",
+          "/home/pi/hermes-codon-lab-20261114/qualification/probe_declared_fields_fix.codon"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": "",
+        "wall_s": 13.503750381059945
+      },
+      "execution": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/qualification/declared_fields_fix"
+        ],
+        "returncode": 0,
+        "stdout": "7\n",
+        "stderr": "",
+        "wall_s": 0.013994585955515504
+      },
+      "semantics_passed": true,
+      "fingerprint": "c9700958bd7804902fad25da7a79914feb9b88f80a7afe64a5578686d4515335",
+      "executable_sha256": "587fc849ca0de33a69a9e169d0a923a0e6038b999cc6a84b148f3c841896f519",
+      "reused_unchanged_probe": true
+    },
+    "dynamic_method": {
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/qualification/dynamic_method",
+          "/home/pi/hermes-codon-lab-20261114/qualification/probe_dynamic_method.codon"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "\u001b[1m/home/pi/hermes-codon-lab-20261114/qualification/probe_dynamic_method.codon:4 (9-16): \u001b[1;31merror:\u001b[0m\u001b[1m 'Context[T_name.0]' object has no attribute 'register_custom'\u001b[0m\n",
+        "wall_s": 11.757750171003863
+      },
+      "fingerprint": "0d70142d2e0aaa481b6e4df572d582c6d553c4d39cc9f2c9d7b03ca6adfd99ee",
+      "reused_unchanged_probe": true
+    },
+    "static_method_fix": {
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/qualification/static_method_fix",
+          "/home/pi/hermes-codon-lab-20261114/qualification/probe_static_method_fix.codon"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": "",
+        "wall_s": 13.425994394114241
+      },
+      "execution": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/qualification/static_method_fix"
+        ],
+        "returncode": 0,
+        "stdout": "local-ok\n",
+        "stderr": "",
+        "wall_s": 0.01396540505811572
+      },
+      "semantics_passed": true,
+      "fingerprint": "cfb514fd153c1f078c7eb632a927e03de82c856e633e64f9b81b7c125500de8c",
+      "executable_sha256": "d92281067c9a137b2ffb2486680b99a5ef618abd7cbf2cfb0e69e9d5efccdbcc",
+      "reused_unchanged_probe": true
+    },
+    "dynamic_import": {
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/qualification/dynamic_import",
+          "/home/pi/hermes-codon-lab-20261114/qualification/probe_dynamic_import.codon"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "\u001b[1m/home/pi/hermes-codon-lab-20261114/qualification/probe_dynamic_import.codon:1 (1-17): \u001b[1;31merror:\u001b[0m\u001b[1m no module named 'importlib'\u001b[0m\n",
+        "wall_s": 11.685361142037436
+      },
+      "fingerprint": "e697e875124fb4f7e47e6922803a4ccda24b6ecc4275371a1e2daf27bbf6eb31",
+      "reused_unchanged_probe": true
+    },
+    "python_import_boundary": {
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/qualification/python_import_boundary",
+          "/home/pi/hermes-codon-lab-20261114/qualification/probe_python_import_boundary.codon"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": "",
+        "wall_s": 43.98643356910907
+      },
+      "execution": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/qualification/python_import_boundary"
+        ],
+        "returncode": 0,
+        "stdout": "7\n",
+        "stderr": "",
+        "wall_s": 0.08264821115881205
+      },
+      "semantics_passed": true,
+      "fingerprint": "51ad22b43fde5c3a11ddec79f015fc29caa60ca3b09986ec83bb8bdce6b96043",
+      "executable_sha256": "9c17741248aaefb887d8e08092e9d36c9f9c7d0221061f874cc2ba556888c152",
+      "reused_unchanged_probe": true
+    },
+    "contextvars": {
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/qualification/contextvars",
+          "/home/pi/hermes-codon-lab-20261114/qualification/probe_contextvars.codon"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "\u001b[1m/home/pi/hermes-codon-lab-20261114/qualification/probe_contextvars.codon:1 (1-19): \u001b[1;31merror:\u001b[0m\u001b[1m no module named 'contextvars'\u001b[0m\n",
+        "wall_s": 11.759031811030582
+      },
+      "fingerprint": "6dacb3072a516bc1052f0d6f1181dfbcbebefa6a784b0967f6462e85c5ad6e6b",
+      "reused_unchanged_probe": true
+    },
+    "async_baseline": {
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/qualification/async_baseline",
+          "/home/pi/hermes-codon-lab-20261114/qualification/probe_async_baseline.codon"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": "",
+        "wall_s": 47.48579602316022
+      },
+      "execution": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/qualification/async_baseline"
+        ],
+        "returncode": 0,
+        "stdout": "7\n",
+        "stderr": "",
+        "wall_s": 0.014195834985002875
+      },
+      "semantics_passed": true,
+      "fingerprint": "53b71f0448a4abd9644c81403352c63b18e037c5b2911cec7a8b9f917ffe4ea4",
+      "executable_sha256": "1033192e04ddbbb24ed78cc2662aae5e5cfb391b6a92db7315c0ec87142a5241",
+      "reused_unchanged_probe": true
+    },
+    "async_to_thread": {
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/qualification/async_to_thread",
+          "/home/pi/hermes-codon-lab-20261114/qualification/probe_async_to_thread.codon"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "\u001b[1m/home/pi/hermes-codon-lab-20261114/qualification/probe_async_to_thread.codon:6 (17-45): \u001b[1;31merror:\u001b[0m\u001b[1m cannot import name 'to_thread' from 'asyncio'\u001b[0m\n\u2570\u2500 \u001b[1m/home/pi/hermes-codon-lab-20261114/qualification/probe_async_to_thread.codon:7 (13-19): \u001b[1;31merror:\u001b[0m\u001b[1m during the realization of main()\u001b[0m\n",
+        "wall_s": 11.64233565912582
+      },
+      "fingerprint": "ac837b749d07317dd19d93e82a458792808cff9ceba142dc2a30bd5d9e9b3987",
+      "reused_unchanged_probe": true
+    },
+    "async_executor": {
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/qualification/async_executor",
+          "/home/pi/hermes-codon-lab-20261114/qualification/probe_async_executor.codon"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "\u001b[1m/home/pi/hermes-codon-lab-20261114/qualification/probe_async_executor.codon:6 (17-76): \u001b[1;31merror:\u001b[0m\u001b[1m 'EventLoop' object has no attribute 'run_in_executor'\u001b[0m\n\u2570\u2500 \u001b[1m/home/pi/hermes-codon-lab-20261114/qualification/probe_async_executor.codon:7 (13-19): \u001b[1;31merror:\u001b[0m\u001b[1m during the realization of main()\u001b[0m\n",
+        "wall_s": 13.674186649965122
+      },
+      "fingerprint": "9db6883f78de7181d4241c945cfd1327b7478e172f51ce5830bca0450bf8cde4",
+      "reused_unchanged_probe": true
+    },
+    "async_timeout": {
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/qualification/async_timeout",
+          "/home/pi/hermes-codon-lab-20261114/qualification/probe_async_timeout.codon"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "\u001b[1m/home/pi/hermes-codon-lab-20261114/qualification/probe_async_timeout.codon:6 (17-53): \u001b[1;31merror:\u001b[0m\u001b[1m cannot import name 'wait_for' from 'asyncio'\u001b[0m\n\u2570\u2500 \u001b[1m/home/pi/hermes-codon-lab-20261114/qualification/probe_async_timeout.codon:7 (13-19): \u001b[1;31merror:\u001b[0m\u001b[1m during the realization of main()\u001b[0m\n",
+        "wall_s": 11.927217547083274
+      },
+      "fingerprint": "1c2b360d888d87743677340eec95e3ea103ae0de6f240d87c09450a799470014",
+      "reused_unchanged_probe": true
+    },
+    "async_gather_exceptions": {
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/qualification/async_gather_exceptions",
+          "/home/pi/hermes-codon-lab-20261114/qualification/probe_async_gather_exceptions.codon"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "\u001b[1m/home/pi/hermes-codon-lab-20261114/qualification/probe_async_gather_exceptions.codon:6 (59-63): \u001b[1;31merror:\u001b[0m\u001b[1m 'return_exceptions' is an invalid keyword argument for gather()\u001b[0m\n\u2570\u2500 \u001b[1m/home/pi/hermes-codon-lab-20261114/qualification/probe_async_gather_exceptions.codon:7 (13-19): \u001b[1;31merror:\u001b[0m\u001b[1m during the realization of main()\u001b[0m\n",
+        "wall_s": 13.79003530391492
+      },
+      "fingerprint": "95a53496faaa3c069f7e34f34c96f49e7d9f42a465bc7e09eb6e454d820ddbeb",
+      "reused_unchanged_probe": true
+    },
+    "python_async_boundary": {
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/qualification/python_async_boundary",
+          "/home/pi/hermes-codon-lab-20261114/qualification/probe_python_async_boundary.codon"
+        ],
+        "returncode": 0,
+        "stdout": "",
+        "stderr": "",
+        "wall_s": 43.24528910894878
+      },
+      "execution": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/qualification/python_async_boundary"
+        ],
+        "returncode": 0,
+        "stdout": "7\n",
+        "stderr": "",
+        "wall_s": 0.24680487718433142
+      },
+      "semantics_passed": true,
+      "fingerprint": "5fd5f439371aff181a25552f079601fee79f5aaf0652bc921b23df6ec574fc9a",
+      "executable_sha256": "8c0eb5af36f7e13e418ae492e486251ffe60d67ac657c3a6ada9aba2cceeecad",
+      "reused_unchanged_probe": true
+    }
+  },
+  "native_entrypoint": {
+    "command": [
+      "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+      "build",
+      "-release",
+      "-mcpu=cortex-a72",
+      "-o",
+      "/home/pi/hermes-codon-lab-20261114/qualification/native-hermes",
+      "/home/pi/hermes-codon-lab-20261114/qualification/native-source/hermes_cli/main.codon"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "\u001b[1m/home/pi/hermes-codon-lab-20261114/qualification/native-source/hermes_bootstrap.codon:18 (1-13): \u001b[1;31merror:\u001b[0m\u001b[1m no module named 'errno'\u001b[0m\n\u2570\u2500 \u001b[1m\u001b[1;31merror:\u001b[0m\u001b[1m during the realization of <import hermes_bootstrap>\u001b[0m\n",
+    "wall_s": 12.856019696919248
+  },
+  "hybrid_build": {
+    "command": [
+      "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+      "build",
+      "-release",
+      "-mcpu=cortex-a72",
+      "-o",
+      "/home/pi/hermes-codon-lab-20261114/qualification/hermes-codon",
+      "/home/pi/hermes-codon-lab-20261114/hermes.codon"
+    ],
+    "returncode": 0,
+    "stdout": "",
+    "stderr": "",
+    "wall_s": 42.75099573493935
+  },
+  "hybrid_version": {
+    "command": [
+      "/home/pi/hermes-codon-lab-20261114/qualification/hermes-codon",
+      "--version"
+    ],
+    "returncode": 0,
+    "stdout": "Hermes Agent v0.22.2 (2026.9.24) \u00b7 stable \u00b7 local d923a5eb487a\nInstall directory: /home/pi/.hermes/hermes-agent\nInstall method: git\nPython: 3.14.7\nOpenAI SDK: 2.24.0\nUpdate available \u2014 run 'hermes update'\n",
+    "stderr": "",
+    "wall_s": 1.9092686930671334
+  },
+  "hybrid_cli_error": {
+    "command": [
+      "/home/pi/hermes-codon-lab-20261114/qualification/hermes-codon",
+      "--codon-invalid-option"
+    ],
+    "returncode": 2,
+    "stdout": "",
+    "stderr": "usage: hermes [-h] [--version] [-z PROMPT] [--usage-file PATH] [-m MODEL]\n              [--provider PROVIDER] [--reasoning LEVEL] [-t TOOLSETS]\n              [--resume SESSION] [--no-restore-cwd] [--in DIR]\n              [--continue [SESSION_NAME]] [--worktree] [--accept-hooks]\n              [--skills SKILLS] [--yolo] [--pass-session-id]\n              [--ignore-user-config] [--ignore-rules] [--safe-mode] [--tui]\n              [--native] [--cli] [--dev]\n              <command> ...\nhermes: error: unrecognized arguments: --codon-invalid-option\n",
+    "wall_s": 3.4690339809749275
+  },
+  "compatibility_passed": true,
+  "compatibility_scope": "Positive native controls and hybrid CPython interoperability; not native Hermes"
+}

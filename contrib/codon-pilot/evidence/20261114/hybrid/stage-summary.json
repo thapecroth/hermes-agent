@@ -1,0 +1,243 @@
+{
+  "startup": {
+    "startup_imports_and_discovery": {
+      "wall_union_s": 8.830060448031873,
+      "aggregate_thread_cpu_s": 6.155919269,
+      "calls": 1
+    }
+  },
+  "first_jobs": {
+    "admission:agents": {
+      "wall_union_s": 0.04672979796305299,
+      "aggregate_thread_cpu_s": 0.0049337759999999176,
+      "calls": 3
+    },
+    "admission:api": {
+      "wall_union_s": 0.030190420802682638,
+      "aggregate_thread_cpu_s": 0.009706400000000611,
+      "calls": 8
+    },
+    "admission:browser": {
+      "wall_union_s": 0.003730383003130555,
+      "aggregate_thread_cpu_s": 0.0009229450000000001,
+      "calls": 1
+    },
+    "database:_execute_write": {
+      "wall_union_s": 1.323658257490024,
+      "aggregate_thread_cpu_s": 0.17821892899999867,
+      "calls": 72
+    },
+    "database:_read_retrying_ioerr": {
+      "wall_union_s": 0.295943123055622,
+      "aggregate_thread_cpu_s": 0.056916916999998554,
+      "calls": 123
+    },
+    "phase:announce_api_call": {
+      "wall_union_s": 2.7638400620780885,
+      "aggregate_thread_cpu_s": 2.23842245,
+      "calls": 6
+    },
+    "phase:apply_retry_restarts": {
+      "wall_union_s": 0.0009048415813595057,
+      "aggregate_thread_cpu_s": 0.0008814289999997116,
+      "calls": 6
+    },
+    "phase:assemble_api_request": {
+      "wall_union_s": 0.17056448198854923,
+      "aggregate_thread_cpu_s": 0.03148186599999986,
+      "calls": 6
+    },
+    "phase:begin_iteration": {
+      "wall_union_s": 0.0016449512913823128,
+      "aggregate_thread_cpu_s": 0.0016493709999996775,
+      "calls": 6
+    },
+    "phase:build_api_request": {
+      "wall_union_s": 0.5031068720854819,
+      "aggregate_thread_cpu_s": 0.10268183199999961,
+      "calls": 6
+    },
+    "phase:check_api_response": {
+      "wall_union_s": 0.2256959960795939,
+      "aggregate_thread_cpu_s": 0.033205418999999875,
+      "calls": 6
+    },
+    "phase:finish_text_response": {
+      "wall_union_s": 0.04571043699979782,
+      "aggregate_thread_cpu_s": 0.024564280999999855,
+      "calls": 3
+    },
+    "phase:normalize_model_response": {
+      "wall_union_s": 0.03722241590730846,
+      "aggregate_thread_cpu_s": 0.010821835000000085,
+      "calls": 6
+    },
+    "phase:nous_rate_limit_guard": {
+      "wall_union_s": 0.0030398895032703876,
+      "aggregate_thread_cpu_s": 0.0008327239999997849,
+      "calls": 6
+    },
+    "phase:perform_api_call": {
+      "wall_union_s": 15.208751492202282,
+      "aggregate_thread_cpu_s": 0.1312196249999997,
+      "calls": 6
+    },
+    "phase:prepare_iteration": {
+      "wall_union_s": 0.04679010412655771,
+      "aggregate_thread_cpu_s": 0.003138886999999979,
+      "calls": 6
+    },
+    "phase:run_preflight_gate": {
+      "wall_union_s": 0.07041835901327431,
+      "aggregate_thread_cpu_s": 0.005017466999999831,
+      "calls": 6
+    },
+    "phase:run_tool_round": {
+      "wall_union_s": 11.310655309120193,
+      "aggregate_thread_cpu_s": 0.1729053719999998,
+      "calls": 3
+    },
+    "provider_transport": {
+      "wall_union_s": 15.177943725138903,
+      "aggregate_thread_cpu_s": 0.10091377399999993,
+      "calls": 6
+    },
+    "system_prompt": {
+      "wall_union_s": 0.19711271091364324,
+      "aggregate_thread_cpu_s": 0.12258421499999995,
+      "calls": 3
+    },
+    "tool:browser_exec": {
+      "wall_union_s": 10.99397552991286,
+      "aggregate_thread_cpu_s": 0.851236085,
+      "calls": 1
+    },
+    "tool:web_search": {
+      "wall_union_s": 3.6247596200555563,
+      "aggregate_thread_cpu_s": 0.663913797,
+      "calls": 2
+    },
+    "turn_context": {
+      "wall_union_s": 0.7830873839557171,
+      "aggregate_thread_cpu_s": 0.35036781100000003,
+      "calls": 3
+    }
+  },
+  "process_warm_new_sessions": {
+    "admission:agents": {
+      "wall_union_s": 0.10220431606285274,
+      "aggregate_thread_cpu_s": 0.005845834999999994,
+      "calls": 3
+    },
+    "admission:api": {
+      "wall_union_s": 0.0681080010253936,
+      "aggregate_thread_cpu_s": 0.01624403500000002,
+      "calls": 8
+    },
+    "admission:browser": {
+      "wall_union_s": 0.0012428059708327055,
+      "aggregate_thread_cpu_s": 0.0007310009999999998,
+      "calls": 1
+    },
+    "database:_execute_write": {
+      "wall_union_s": 1.386739210691303,
+      "aggregate_thread_cpu_s": 0.1702196109999996,
+      "calls": 72
+    },
+    "database:_read_retrying_ioerr": {
+      "wall_union_s": 0.8071022320073098,
+      "aggregate_thread_cpu_s": 0.06987179600000015,
+      "calls": 123
+    },
+    "phase:announce_api_call": {
+      "wall_union_s": 0.038196605863049626,
+      "aggregate_thread_cpu_s": 0.009244907999999996,
+      "calls": 6
+    },
+    "phase:apply_retry_restarts": {
+      "wall_union_s": 0.0005629290826618671,
+      "aggregate_thread_cpu_s": 0.0005616289999999802,
+      "calls": 6
+    },
+    "phase:assemble_api_request": {
+      "wall_union_s": 0.1314563644118607,
+      "aggregate_thread_cpu_s": 0.029367758999999993,
+      "calls": 6
+    },
+    "phase:begin_iteration": {
+      "wall_union_s": 0.00141960009932518,
+      "aggregate_thread_cpu_s": 0.0014239259999999782,
+      "calls": 6
+    },
+    "phase:build_api_request": {
+      "wall_union_s": 0.20993380504660308,
+      "aggregate_thread_cpu_s": 0.10280472700000001,
+      "calls": 6
+    },
+    "phase:check_api_response": {
+      "wall_union_s": 0.09082624246366322,
+      "aggregate_thread_cpu_s": 0.026535168999999997,
+      "calls": 6
+    },
+    "phase:finish_text_response": {
+      "wall_union_s": 0.0776677408721298,
+      "aggregate_thread_cpu_s": 0.021063149000000003,
+      "calls": 3
+    },
+    "phase:normalize_model_response": {
+      "wall_union_s": 0.11925963615067303,
+      "aggregate_thread_cpu_s": 0.012493373000000002,
+      "calls": 6
+    },
+    "phase:nous_rate_limit_guard": {
+      "wall_union_s": 0.0005228361114859581,
+      "aggregate_thread_cpu_s": 0.0005206110000000042,
+      "calls": 6
+    },
+    "phase:perform_api_call": {
+      "wall_union_s": 9.936612649820745,
+      "aggregate_thread_cpu_s": 0.10393909199999998,
+      "calls": 6
+    },
+    "phase:prepare_iteration": {
+      "wall_union_s": 0.01638941210694611,
+      "aggregate_thread_cpu_s": 0.002452591000000004,
+      "calls": 6
+    },
+    "phase:run_preflight_gate": {
+      "wall_union_s": 0.025953488890081644,
+      "aggregate_thread_cpu_s": 0.004557313999999965,
+      "calls": 6
+    },
+    "phase:run_tool_round": {
+      "wall_union_s": 11.0673714322038,
+      "aggregate_thread_cpu_s": 0.11918215800000001,
+      "calls": 3
+    },
+    "provider_transport": {
+      "wall_union_s": 9.815685977227986,
+      "aggregate_thread_cpu_s": 0.06728233500000001,
+      "calls": 6
+    },
+    "system_prompt": {
+      "wall_union_s": 0.2851907447911799,
+      "aggregate_thread_cpu_s": 0.065255071,
+      "calls": 3
+    },
+    "tool:browser_exec": {
+      "wall_union_s": 10.889002033043653,
+      "aggregate_thread_cpu_s": 0.32866972899999997,
+      "calls": 1
+    },
+    "tool:web_search": {
+      "wall_union_s": 0.06196088995784521,
+      "aggregate_thread_cpu_s": 0.029831961000000004,
+      "calls": 2
+    },
+    "turn_context": {
+      "wall_union_s": 0.9155171029269695,
+      "aggregate_thread_cpu_s": 0.216239395,
+      "calls": 3
+    }
+  }
+}

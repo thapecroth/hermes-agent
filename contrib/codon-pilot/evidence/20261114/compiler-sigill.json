@@ -1,0 +1,6 @@
+{
+  "signal": "SIGILL",
+  "pc": "0x5575fea538",
+  "mapping": "5575fb0000-557603c000 r-xp 00000000 08:02 959880                         /home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon",
+  "instruction": "96fee8c81f0100f1e100005431030094"
+}

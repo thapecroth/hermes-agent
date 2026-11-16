@@ -1,0 +1,137 @@
+{
+  "whole_stack_native": false,
+  "python_fallback": false,
+  "builds": {
+    "errno_shim": {
+      "source_sha256": "c92c8de2468d6d39a08ce8b2498aee5279c8954c7aee033006ae185bb132a6b1",
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/native-port/errno_shim",
+          "/home/pi/hermes-codon-lab-20261114/native-port/check_errno.codon"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "\u001b[1m/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/lib/codon/stdlib/internal/builtin.codon:8 (16-78): \u001b[1;31merror:\u001b[0m\u001b[1m 'Import['/home/pi/hermes-codon-lab-20261114/qualification/native-source/errno.codon','errno']' object has no attribute 'WSAEWOULDBLOCK'\u001b[0m\n\u2570\u2500 \u001b[1m/home/pi/hermes-codon-lab-20261114/native-port/check_errno.codon:11 (8-47): \u001b[1;31merror:\u001b[0m\u001b[1m during the realization of getattr(obj: Import['/home/pi/hermes-codon-lab-20261114/qualification/native-source/errno.codon','errno'], attr: 'WSAEWOULDBLOCK', default: int, typ: NoneType)\u001b[0m\n",
+        "wall_s": 11.809799348935485
+      }
+    },
+    "hermes_cli": {
+      "source_sha256": "88a7fc166d3bfaac082d44bbfc36c93b53c50f7508ca96e32206dc3f1edfaa82",
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/native-port/hermes_cli",
+          "/home/pi/hermes-codon-lab-20261114/qualification/native-source/hermes_cli/main.codon"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "\u001b[1m/home/pi/hermes-codon-lab-20261114/qualification/native-source/hermes_bootstrap.codon:19 (1-21): \u001b[1;31merror:\u001b[0m\u001b[1m no module named 'importlib.abc'\u001b[0m\n\u2570\u2500 \u001b[1m\u001b[1;31merror:\u001b[0m\u001b[1m during the realization of <import hermes_bootstrap>\u001b[0m\n",
+        "wall_s": 12.645224111853167
+      }
+    },
+    "conversation_agent": {
+      "source_sha256": "2bd45c545c2cf0dec95702e71232f026b1265b54bf234a1c03c8cf83f5236f10",
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/native-port/conversation_agent",
+          "/home/pi/hermes-codon-lab-20261114/qualification/native-source/run_agent.codon"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "\u001b[1m/home/pi/hermes-codon-lab-20261114/qualification/native-source/run_agent.codon:214 (15): \u001b[1;31merror:\u001b[0m\u001b[1m syntax error, unexpected '\\n'\u001b[0m\n",
+        "wall_s": 0.16332347295247018
+      }
+    },
+    "session_database": {
+      "source_sha256": "c24484b3026a377621dd1a0f1d23de8e0d9d9d0b6d9600d47cee9368646c9577",
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/native-port/session_database",
+          "/home/pi/hermes-codon-lab-20261114/qualification/native-source/hermes_state.codon"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "\u001b[1m/home/pi/hermes-codon-lab-20261114/qualification/native-source/hermes_state.codon:460 (17): \u001b[1;31merror:\u001b[0m\u001b[1m syntax error, unexpected '\\n'\u001b[0m\n",
+        "wall_s": 0.2721361860167235
+      }
+    },
+    "locale_catalog": {
+      "source_sha256": "bdd29bd8e77c896137e81e04a0be26caf8a8185b4e7df237d2f1aa245a78e325",
+      "build": {
+        "command": [
+          "/home/pi/hermes-codon-lab-20261114/codon-deploy-manylinux2014-aarch64/bin/codon-a72",
+          "build",
+          "-release",
+          "-mcpu=cortex-a72",
+          "-o",
+          "/home/pi/hermes-codon-lab-20261114/native-port/locale_catalog",
+          "/home/pi/hermes-codon-lab-20261114/qualification/native-source/agent/i18n.codon"
+        ],
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "\u001b[1m/home/pi/hermes-codon-lab-20261114/qualification/native-source/agent/i18n.codon:19 (1-15): \u001b[1;31merror:\u001b[0m\u001b[1m no module named 'logging'\u001b[0m\n",
+        "wall_s": 11.864603329915553
+      }
+    }
+  },
+  "target_headers": {
+    "command": [
+      "cc",
+      "-dM",
+      "-E",
+      "-include",
+      "errno.h",
+      "-x",
+      "c",
+      "/dev/null"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "wall_s": 0.21143173705786467,
+    "stdout_sha256": "53d6bd950375e9c6cf4542b4d6fbb7d937f84b2b92b6a5af05f774a231a1b600",
+    "selected_errno_defines": [
+      "#define EACCES 13",
+      "#define EINPROGRESS 115",
+      "#define EALREADY 114",
+      "#define EINTR 4",
+      "#define EDEADLK 35",
+      "#define ENOSPC 28",
+      "#define EISCONN 106",
+      "#define EWOULDBLOCK EAGAIN",
+      "#define EAGAIN 11"
+    ]
+  },
+  "errno_values": {
+    "EINTR": 4,
+    "EAGAIN": 11,
+    "EWOULDBLOCK": 11,
+    "EISCONN": 106,
+    "EALREADY": 114,
+    "EINPROGRESS": 115,
+    "EACCES": 13,
+    "EDEADLK": 35,
+    "ENOSPC": 28
+  },
+  "errno_shim_sha256": "a49d6d41f7161fba4c34bfd587c65aa3e761befd7ecfa6205b7f5edae00f6853",
+  "errno_addressed_natively": false,
+  "native_entrypoint_passed": false
+}

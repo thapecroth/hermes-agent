@@ -1,0 +1,277 @@
+{
+  "qualification_date": "2026-11-15",
+  "timezone": "America/Los_Angeles",
+  "scope": "Manager titles, silent intake, task lineage and native skill review on installed Pi core",
+  "standalone_tests": {
+    "passed": 83,
+    "log_sha256": "fc33ce31052fe302379fc6bc289bb116338d5c18b05248a27ec1c6e9f79c4b5c"
+  },
+  "installed_core_e2e": {
+    "passed": true,
+    "real_hermes_admission_and_delegation": true,
+    "provider": "deterministic fixture",
+    "telegram_delivery": "captured adapter; no external sends",
+    "early_discovery_bootstrap_before_intake": true,
+    "jobs": [
+      {
+        "id": 1,
+        "title": "Research Alpha",
+        "state": "completed"
+      },
+      {
+        "id": 2,
+        "title": "Research Beta",
+        "state": "cancelled"
+      },
+      {
+        "id": 3,
+        "title": "Summarize attachment",
+        "state": "completed"
+      },
+      {
+        "id": 4,
+        "title": "Research Alpha",
+        "state": "completed"
+      },
+      {
+        "id": 5,
+        "title": "E2E SKILL capture",
+        "state": "completed"
+      },
+      {
+        "id": 6,
+        "title": "REJECT SKILL PATCH",
+        "state": "completed"
+      },
+      {
+        "id": 7,
+        "title": "CANCEL SKILL REVIEW",
+        "state": "completed"
+      },
+      {
+        "id": 8,
+        "title": "Review Disabled",
+        "state": "completed"
+      },
+      {
+        "id": 9,
+        "title": "Post Stop Work",
+        "state": "completed"
+      }
+    ],
+    "latency_seconds": {
+      "first": 0.128,
+      "while_worker_running": 0.03,
+      "status": 0.034
+    },
+    "steering_applied": true,
+    "selected_cancellation": true,
+    "approval_isolation": true,
+    "media_delegated": true,
+    "deduplication": true,
+    "main_agent_calls": 0,
+    "silent_intake": true,
+    "three_word_titles": true,
+    "reused_title_and_task_lineage": true,
+    "native_skill_review_updated_file": true,
+    "skill_notice_delivered_after_result": true,
+    "failed_patch_did_not_notify": true,
+    "disabled_review_made_no_provider_call": true,
+    "stop_interrupts_native_review": true,
+    "new_work_and_review_after_stop": true,
+    "shutdown_fences_review_construction_and_admission": true,
+    "review_modes": [
+      "noop",
+      "noop",
+      "noop",
+      "update",
+      "reject",
+      "cancel",
+      "noop"
+    ],
+    "remaining_leases": {
+      "agents": [],
+      "api": [],
+      "browser": []
+    }
+  },
+  "live_provider_canary": {
+    "passed": true,
+    "uses_real_model_provider": true,
+    "model": "gpt-6.1-sol",
+    "routing_decisions": [
+      {
+        "action": "new",
+        "target": null,
+        "title": "SQLite Transaction Docs"
+      },
+      {
+        "action": "steer",
+        "target": 1,
+        "title": null
+      },
+      {
+        "action": "cancel",
+        "target": 2,
+        "title": null
+      }
+    ],
+    "real_delegated_worker_completed": true,
+    "external_message_sends": 0,
+    "transcript_isolated": true
+  },
+  "deployment": {
+    "deployed": true,
+    "runtime_hashes": {
+      "manager.py": "f65a604b1955339d3b6963052d12b1db8a9cd64e1396f93b3e4a92bd1b09afb4",
+      "manager_runtime.py": "965e38baccd81ae71df59c274fd2b1fb22a7a9de43321926b1f1090f47302e24"
+    },
+    "pi_rebooted": false,
+    "fresh_gateway_manager_adapter_api_health": true
+  },
+  "serving_state": {
+    "passed": true,
+    "historical_job_ids_states_preserved": true,
+    "job_count": 74,
+    "titles_at_most_three_words": true,
+    "task_keys_present": true,
+    "historical_skill_reviews_enqueued": 0,
+    "skill_review_states": {},
+    "native_review_enabled": true,
+    "skill_review_interval": 15,
+    "runtime_hashes": {
+      "manager.py": "f65a604b1955339d3b6963052d12b1db8a9cd64e1396f93b3e4a92bd1b09afb4",
+      "manager_runtime.py": "965e38baccd81ae71df59c274fd2b1fb22a7a9de43321926b1f1090f47302e24"
+    }
+  },
+  "serving_health": {
+    "passed": true,
+    "unit": {
+      "MainPID": "3428438",
+      "NRestarts": "0",
+      "OOMPolicy": "kill",
+      "MemoryMax": "5368709120",
+      "TasksMax": "1024",
+      "ActiveState": "active"
+    },
+    "gateway_state": "running",
+    "platforms": {
+      "telegram": "connected",
+      "api_server": "connected",
+      "photon": "connected"
+    },
+    "health": "ok",
+    "manager_pid": 3428438,
+    "manager_heartbeat_advances": true,
+    "watchdog_timer": "active",
+    "limits": {
+      "agents": 10,
+      "api": 10,
+      "browsers": 2,
+      "manager_jobs": 3
+    },
+    "delegation_depth": 2,
+    "remaining_leases": {
+      "agents": [],
+      "api": [],
+      "browser": []
+    },
+    "browser": {
+      "backend": "browser-use",
+      "engine": "lightpanda",
+      "cloud_provider": "local"
+    }
+  },
+  "browser_dashboard_health": {
+    "gateway_state": "running",
+    "platforms": {
+      "telegram": {
+        "state": "connected",
+        "has_error": false
+      },
+      "api_server": {
+        "state": "connected",
+        "has_error": false
+      },
+      "photon": {
+        "state": "connected",
+        "has_error": false
+      }
+    },
+    "limits": {
+      "agents": 10,
+      "api": 10,
+      "browsers": 2,
+      "manager_jobs": 3
+    },
+    "engine": "lightpanda",
+    "shared_cdp_configured": false,
+    "real_profile": false,
+    "desktop_placement": "gateway",
+    "snapshot_mode": "0o600",
+    "occupied": {
+      "agents": [],
+      "api": [],
+      "browser": []
+    },
+    "manager_states": {
+      "completed": 73,
+      "failed": 1
+    },
+    "rendered_owner_present": false,
+    "rendered_processes": [],
+    "dashboard_loopback_only": true,
+    "api_health": {
+      "status": "ok",
+      "platform": "hermes-agent",
+      "version": "0.22.2"
+    },
+    "local_manifest_matches": true
+  },
+  "fork_core": {
+    "tests": 12030,
+    "errors": 51,
+    "skipped": 97,
+    "passed": 11812,
+    "failed": 70,
+    "green": false,
+    "baseline": {
+      "passed": 11819,
+      "failed": 68,
+      "errors": 46,
+      "skipped": 97
+    },
+    "new_failure_or_error_names": [
+      "tests/gateway/test_discord_reply_mode.py::TestReplyToText::test_no_reference_both_none",
+      "tests/gateway/test_discord_reply_mode.py::TestReplyToText::test_reference_with_deleted_message",
+      "tests/gateway/test_discord_reply_mode.py::TestReplyToText::test_reference_with_empty_resolved_content",
+      "tests/gateway/test_discord_reply_mode.py::TestReplyToText::test_reference_with_resolved_content",
+      "tests/gateway/test_discord_reply_mode.py::TestReplyToText::test_reference_without_resolved",
+      "tests/gateway/test_session_env.py::test_set_session_env_includes_session_key",
+      "tests/hermes_cli/test_plugins.py::TestPluginCommands::test_register_command_builtin_conflict_rejected",
+      "tests/hermes_cli/test_plugins.py::TestPluginCommands::test_register_command_empty_name_rejected"
+    ],
+    "different_names_focused_recheck": {
+      "passed": 8,
+      "failed": 0,
+      "log_sha256": "adb990c80960b9498d1ab4a206d01697667fc8514efed8b35b0e4a00aa878a33"
+    },
+    "comparison_note": "All eight different names passed in a fresh focused process. This run was serial; the prior baseline used xdist. The broad suite remains failed.",
+    "serial_difference_analysis": [
+      "The Discord import test leaves a replacement package module with discord=None for later reply fixtures.",
+      "GatewayRunner leaves a process-environment session key; clear_session_vars clears rather than restores that fallback.",
+      "CLI usage reporting leaves the hermes_cli logger at ERROR, suppressing warnings expected by later plugin tests."
+    ],
+    "baseline_names_not_repeated": [
+      "tests/hermes_cli/test_xiaomi_provider.py::TestXiaomiAutoDetection::test_auto_detect"
+    ],
+    "log_sha256": "1f228380ba1eb319b65d3482ac3df4d1554fcb0866816c0c11e8860e91dda8f8",
+    "baseline_log_sha256": "92d0ba5bcb8c8f0e9857bed5eeac6f7c27df9be587d134966fb550d2ca2519d6"
+  },
+  "limits": [
+    "External Telegram sends were captured; Telegram network delivery was not tested.",
+    "Local intake timings exclude model classification and Telegram network latency.",
+    "The final provider canary used the same manager runtime hashes qualified by the installed-core fixture and serving-state checks.",
+    "The fork core differs from the installed Pi core; broad suite failures are reported separately."
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "fixture_only": true,
+  "human_fence": true,
+  "live_form_input_and_javascript": true,
+  "address_bar_and_handback": true,
+  "fit_cycle": true,
+  "reconnect_preserves_fence_and_requires_force": true,
+  "foreign_viewer_eviction_disables_input": true,
+  "mobile_no_horizontal_overflow": true,
+  "close_and_release": true,
+  "stop_screen": true,
+  "local_browser_disconnected": true
+}

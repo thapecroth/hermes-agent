@@ -1,0 +1,248 @@
+{
+  "startup": {
+    "startup_imports_and_discovery": {
+      "wall_union_s": 6.498128454899415,
+      "aggregate_thread_cpu_s": 4.568566447,
+      "calls": 1
+    }
+  },
+  "first_jobs": {
+    "admission:agents": {
+      "wall_union_s": 0.06791319907642901,
+      "aggregate_thread_cpu_s": 0.004214111999999881,
+      "calls": 3
+    },
+    "admission:api": {
+      "wall_union_s": 0.08267656108364463,
+      "aggregate_thread_cpu_s": 0.00959952500000065,
+      "calls": 9
+    },
+    "admission:browser": {
+      "wall_union_s": 0.0026800809428095818,
+      "aggregate_thread_cpu_s": 0.0006999269999999999,
+      "calls": 1
+    },
+    "database:_execute_write": {
+      "wall_union_s": 0.8583592567592859,
+      "aggregate_thread_cpu_s": 0.14186095599999915,
+      "calls": 72
+    },
+    "database:_read_retrying_ioerr": {
+      "wall_union_s": 0.5816860983613878,
+      "aggregate_thread_cpu_s": 0.06703232300000032,
+      "calls": 123
+    },
+    "phase:announce_api_call": {
+      "wall_union_s": 6.2788963210769,
+      "aggregate_thread_cpu_s": 4.9007472199999995,
+      "calls": 6
+    },
+    "phase:apply_retry_restarts": {
+      "wall_union_s": 0.0006431541405618191,
+      "aggregate_thread_cpu_s": 0.0006439259999997393,
+      "calls": 6
+    },
+    "phase:assemble_api_request": {
+      "wall_union_s": 0.2830074322409928,
+      "aggregate_thread_cpu_s": 0.02544480099999996,
+      "calls": 6
+    },
+    "phase:begin_iteration": {
+      "wall_union_s": 0.0012975179124623537,
+      "aggregate_thread_cpu_s": 0.0012962580000000223,
+      "calls": 6
+    },
+    "phase:build_api_request": {
+      "wall_union_s": 0.47739257803186774,
+      "aggregate_thread_cpu_s": 0.1011750229999997,
+      "calls": 7
+    },
+    "phase:check_api_response": {
+      "wall_union_s": 0.11446776078082621,
+      "aggregate_thread_cpu_s": 0.025659316999999904,
+      "calls": 6
+    },
+    "phase:finish_text_response": {
+      "wall_union_s": 0.10015961015596986,
+      "aggregate_thread_cpu_s": 0.025413861000000315,
+      "calls": 3
+    },
+    "phase:handle_api_error": {
+      "wall_union_s": 2.223829154158011,
+      "aggregate_thread_cpu_s": 0.010791581999999966,
+      "calls": 1
+    },
+    "phase:normalize_model_response": {
+      "wall_union_s": 0.0465172475669533,
+      "aggregate_thread_cpu_s": 0.01063849699999908,
+      "calls": 6
+    },
+    "phase:nous_rate_limit_guard": {
+      "wall_union_s": 0.0005956485401839018,
+      "aggregate_thread_cpu_s": 0.0005944629999996565,
+      "calls": 7
+    },
+    "phase:perform_api_call": {
+      "wall_union_s": 14.423398160142824,
+      "aggregate_thread_cpu_s": 0.12966440599999962,
+      "calls": 7
+    },
+    "phase:prepare_iteration": {
+      "wall_union_s": 0.0026015224866569042,
+      "aggregate_thread_cpu_s": 0.0022446290000000396,
+      "calls": 6
+    },
+    "phase:run_preflight_gate": {
+      "wall_union_s": 0.04737447202205658,
+      "aggregate_thread_cpu_s": 0.003631757000000027,
+      "calls": 6
+    },
+    "phase:run_tool_round": {
+      "wall_union_s": 7.496684038080275,
+      "aggregate_thread_cpu_s": 0.16326259300000023,
+      "calls": 3
+    },
+    "provider_transport": {
+      "wall_union_s": 14.317157438024879,
+      "aggregate_thread_cpu_s": 0.10029961500000084,
+      "calls": 7
+    },
+    "system_prompt": {
+      "wall_union_s": 1.717752352822572,
+      "aggregate_thread_cpu_s": 0.120025446,
+      "calls": 3
+    },
+    "tool:browser_exec": {
+      "wall_union_s": 7.338139750994742,
+      "aggregate_thread_cpu_s": 0.679330945,
+      "calls": 1
+    },
+    "tool:web_search": {
+      "wall_union_s": 5.790345147717744,
+      "aggregate_thread_cpu_s": 0.391138037,
+      "calls": 2
+    },
+    "turn_context": {
+      "wall_union_s": 2.099047682946548,
+      "aggregate_thread_cpu_s": 0.271081489,
+      "calls": 3
+    }
+  },
+  "process_warm_new_sessions": {
+    "admission:agents": {
+      "wall_union_s": 0.00922033004462719,
+      "aggregate_thread_cpu_s": 0.0032432580000000127,
+      "calls": 3
+    },
+    "admission:api": {
+      "wall_union_s": 0.012087243609130383,
+      "aggregate_thread_cpu_s": 0.006804055000000028,
+      "calls": 8
+    },
+    "admission:browser": {
+      "wall_union_s": 0.0007836141157895327,
+      "aggregate_thread_cpu_s": 0.000610927,
+      "calls": 1
+    },
+    "database:_execute_write": {
+      "wall_union_s": 0.8776029369328171,
+      "aggregate_thread_cpu_s": 0.14829871100000033,
+      "calls": 72
+    },
+    "database:_read_retrying_ioerr": {
+      "wall_union_s": 0.23619605926796794,
+      "aggregate_thread_cpu_s": 0.054202740999999895,
+      "calls": 123
+    },
+    "phase:announce_api_call": {
+      "wall_union_s": 0.005458490224555135,
+      "aggregate_thread_cpu_s": 0.005357201000000006,
+      "calls": 6
+    },
+    "phase:apply_retry_restarts": {
+      "wall_union_s": 0.000458564143627882,
+      "aggregate_thread_cpu_s": 0.0004599810000000121,
+      "calls": 6
+    },
+    "phase:assemble_api_request": {
+      "wall_union_s": 0.046545834047719836,
+      "aggregate_thread_cpu_s": 0.02193866500000001,
+      "calls": 6
+    },
+    "phase:begin_iteration": {
+      "wall_union_s": 0.000977024668827653,
+      "aggregate_thread_cpu_s": 0.0009772210000000142,
+      "calls": 6
+    },
+    "phase:build_api_request": {
+      "wall_union_s": 0.1152538750320673,
+      "aggregate_thread_cpu_s": 0.07896777899999999,
+      "calls": 6
+    },
+    "phase:check_api_response": {
+      "wall_union_s": 0.08389151468873024,
+      "aggregate_thread_cpu_s": 0.024524923999999962,
+      "calls": 6
+    },
+    "phase:finish_text_response": {
+      "wall_union_s": 0.02530394191853702,
+      "aggregate_thread_cpu_s": 0.015138168000000007,
+      "calls": 3
+    },
+    "phase:normalize_model_response": {
+      "wall_union_s": 0.0443696363363415,
+      "aggregate_thread_cpu_s": 0.009355463999999952,
+      "calls": 6
+    },
+    "phase:nous_rate_limit_guard": {
+      "wall_union_s": 0.00032712751999497414,
+      "aggregate_thread_cpu_s": 0.00032529399999998987,
+      "calls": 6
+    },
+    "phase:perform_api_call": {
+      "wall_union_s": 8.964144788915291,
+      "aggregate_thread_cpu_s": 0.08111081300000002,
+      "calls": 6
+    },
+    "phase:prepare_iteration": {
+      "wall_union_s": 0.001664274837821722,
+      "aggregate_thread_cpu_s": 0.0016729070000000151,
+      "calls": 6
+    },
+    "phase:run_preflight_gate": {
+      "wall_union_s": 0.011247471906244755,
+      "aggregate_thread_cpu_s": 0.0029846089999999853,
+      "calls": 6
+    },
+    "phase:run_tool_round": {
+      "wall_union_s": 5.706424226984382,
+      "aggregate_thread_cpu_s": 0.09167771000000001,
+      "calls": 3
+    },
+    "provider_transport": {
+      "wall_union_s": 8.957808900857344,
+      "aggregate_thread_cpu_s": 0.06231390699999999,
+      "calls": 6
+    },
+    "system_prompt": {
+      "wall_union_s": 0.22706995904445648,
+      "aggregate_thread_cpu_s": 0.061062705,
+      "calls": 3
+    },
+    "tool:browser_exec": {
+      "wall_union_s": 5.589653241913766,
+      "aggregate_thread_cpu_s": 0.259311075,
+      "calls": 1
+    },
+    "tool:web_search": {
+      "wall_union_s": 4.01402572914958,
+      "aggregate_thread_cpu_s": 0.059592030000000004,
+      "calls": 2
+    },
+    "turn_context": {
+      "wall_union_s": 0.6080475749913603,
+      "aggregate_thread_cpu_s": 0.198942828,
+      "calls": 3
+    }
+  }
+}

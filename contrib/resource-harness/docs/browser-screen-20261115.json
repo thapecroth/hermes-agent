@@ -1,0 +1,82 @@
+{
+  "qualification_date": "2026-11-15 America/Los_Angeles",
+  "runtime": {
+    "host": "rpi",
+    "architecture": "ARM64",
+    "lightpanda": "1.0.4",
+    "invisible_playwright": "0.45.0",
+    "invisible_core": "55.50.0",
+    "firefox_engine": "55 / Firefox 159",
+    "hosted_browser": false
+  },
+  "standalone": {
+    "passed": 73,
+    "failed": 0,
+    "command": "python -m unittest discover -s contrib/resource-harness/tests -v",
+    "log_sha256": "8d9f1063e3c24d5c2f261434051582f70c7a6db23a2785967da49fe39157ba81"
+  },
+  "engine_receipt": "browser-screen-20261115/engine.json",
+  "dashboard_receipt": "browser-screen-20261115/dashboard.json",
+  "deployment_receipt": "browser-screen-20261115/deployment.json",
+  "screenshots": [
+    "browser-screen-20261115/desktop.png",
+    "browser-screen-20261115/mobile.png"
+  ],
+  "visual": {
+    "desktop_viewport": [
+      1440,
+      900
+    ],
+    "mobile_viewport": [
+      390,
+      844
+    ],
+    "inspected": true,
+    "mobile_typing_qualified": false,
+    "notes": "Fit mode makes the remote desktop small; Actual size supports panning. Vertical page scrolling reaches lower controls.",
+    "detector": "2 source files scanned with regex rules only; rendered element/contrast rules did not run."
+  },
+  "dashboard_test_profile": "Fresh isolated identity with an empty auth snapshot; removed after QA.",
+  "deployed_sha256": {
+    "__init__.py": "cf4f2755ffd64d20307957b545ff01a48a8c79e74063c9c67c8f553e6857f222",
+    "browser_auth.py": "180d92ee121fbe505a9457ee89e25e907a87ff199e65adb7b5ce1e3fc21ffc25",
+    "interactive_browser.py": "e2d46e1f154f977523600de8ae9c28a0b8e9dcfcb64710dbf524d877cdf73a9d",
+    "e2e_screen.py": "8b2772f3ff6201c726bf126a9305e10fe3558f6621c69fe9fc350faae19350c9",
+    "plugin.yaml": "a7f66c2aeabf1674de5c1edd30b05b6670db0b4982602d6933e4fc043e0b02ca",
+    "research_prompt.md": "6990cc3b9853f0a92705c5eedaaaaac6a15cedff692d806ce307dd83d66ff904",
+    "dashboard/api.py": "b525878e041085bba20774c9cb882bbb002f883c8c0089e9c0e9eafce95a8132",
+    "dashboard/manifest.json": "8540e445150574bbd73914a12c0558d44dce4d9f02072cc1c7704467c2c043cd",
+    "dashboard/src/index.js": "af07cd23e6b5d032a6659982df1286bdffdf7bb4dc9aaf5eb484ae1c20f4a9c5",
+    "dashboard/dist/index.js": "8ff2ceb25d828f5fd756216ce67854a2b4604a68c0479ce9de56d0146612c603",
+    "dashboard/dist/screen.js": "94c97c69759c790e3123f13bff3ee52c4997bcd8663f38ecfa027cedd6d4af04",
+    "dashboard/src/screen.css": "f29744fa6a43a3bc4462667552de984ff6959f820f47a27df9f68d32063e0bdd"
+  },
+  "core_suite": {
+    "passed": 11819,
+    "failed": 68,
+    "errors": 46,
+    "skipped": 97,
+    "baseline_failed": 69,
+    "baseline_errors": 46,
+    "new_failing_names": [],
+    "baseline_failure_not_repeated": [
+      "FAILED tests/test_plugin_skills.py::TestSkillViewPluginGuards::test_injection_logged_but_served"
+    ],
+    "baseline_log_sha256": "d38e4c2f4333736d1b7bb6ba10d770f5642b4814002fa8c23ab0b399a193c658",
+    "current_log_sha256": "92d0ba5bcb8c8f0e9857bed5eeac6f7c27df9be587d134966fb550d2ca2519d6",
+    "green": false
+  },
+  "limits": {
+    "agents": 10,
+    "api": 10,
+    "browsers": 2,
+    "manager_jobs": 3
+  },
+  "limitations": [
+    "CAPTCHA detection is heuristic and may require human completion.",
+    "No personal-account login qualification.",
+    "Engine handoff transfers supported auth and URL, not live DOM or unsaved forms.",
+    "IndexedDB, passkeys, partitioned cookies, password-manager data and device-bound tokens are not transferred.",
+    "Pinned native ARM64 oss-invisible stack requires requalification before upgrades."
+  ]
+}
