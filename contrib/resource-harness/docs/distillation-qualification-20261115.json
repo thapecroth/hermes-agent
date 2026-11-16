@@ -1,0 +1,130 @@
+{
+  "date": "2026-11-15",
+  "passed": true,
+  "scope": "Installed Hermes real-provider manager delegation in disposable profiles, then guarded Pi deployment and independent live health verification.",
+  "real_provider_e2e": {
+    "passed": true,
+    "model": "gpt-6.1-sol",
+    "real_provider": true,
+    "actual_manager_delegation": true,
+    "rendered_prompt_matches_candidate": true,
+    "rendered_prompt_chars": 3530,
+    "prompt_and_skill_observed": {
+      "child_prompt": true,
+      "skill_view": true
+    },
+    "cases": [
+      {
+        "case": 91001,
+        "completed": true
+      },
+      {
+        "case": 91002,
+        "completed": true
+      },
+      {
+        "case": 91003,
+        "completed": true
+      },
+      {
+        "case": 91004,
+        "completed": true
+      }
+    ],
+    "existing_changed_files": [
+      "concepts/host-cache.md",
+      "log.md"
+    ],
+    "duplicate_input_byte_identical": true,
+    "new_kb_topic_pages": 1,
+    "public_background_omitted": true,
+    "optional_public_pointer_retained": true,
+    "public_only_no_filler": true,
+    "source_instructions_not_executed": true,
+    "external_message_sends": 0,
+    "remaining_leases": {
+      "agents": [],
+      "api": [],
+      "browser": []
+    },
+    "research_prompt_sha256": "81ae499815b536f33547c68bcf9650ff6dbe0c968d53931e5fc6149a4ac8700b",
+    "installed_skill_sha256": "5bc32eacc4da3ac765fcb449fe17317ee0217c67c5d24e277b27e462cf9e6aff"
+  },
+  "canary_script_sha256": "619e589515e6df8ff8b0a0f475397282fe32f9fc055afc788802f776d89d21d4",
+  "standalone_harness_tests": {
+    "command": "python -m unittest discover -s contrib/resource-harness/tests -v",
+    "passed": 83,
+    "failed": 0,
+    "seconds": 0.681,
+    "scratch_filesystem": "tmpfs via TMPDIR in /dev/shm",
+    "disk_backed_attempt": {
+      "passed": 82,
+      "error": "One-second wait timed out in test_classifier_failure_keeps_original_message_and_requests_explicit_routing.",
+      "previous_attempt": "Another disk-backed run hit the one-second wait in test_cancel_waits_for_prior_pending_request_to_be_routed; that test passed in isolation and in the final suite.",
+      "code_and_timeouts_changed_to_pass": false
+    }
+  },
+  "prompt_delivery_regression": {
+    "installed_core_section_limit_chars": 4000,
+    "before": "An oversized registered section was omitted from outbound child requests.",
+    "after": "Core renders the complete candidate and the actual delegated API request contains the new policy."
+  },
+  "deployment": {
+    "deployed": true,
+    "previous_pid": 3428438,
+    "new_pid": 3443258,
+    "initial_gateway_state": "stopped",
+    "fresh_gateway_manager_adapter_api_health": true,
+    "job_count_before": 76,
+    "job_count_after": 76,
+    "existing_skill_customizations_preserved": true,
+    "database_rolled_back": false,
+    "hashes": {
+      "/home/pi/.hermes/plugins/resource-harness/research_prompt.md": "81ae499815b536f33547c68bcf9650ff6dbe0c968d53931e5fc6149a4ac8700b",
+      "/home/pi/.hermes/skills/research/llm-wiki/SKILL.md": "5bc32eacc4da3ac765fcb449fe17317ee0217c67c5d24e277b27e462cf9e6aff"
+    },
+    "pi_rebooted": false
+  },
+  "deployment_recovery": "First attempt timed out waiting for stop before replacing files. Verified both original hashes unchanged; resumed from the stopped unit with polling covering the configured 90-second stop window.",
+  "live_verification": {
+    "verified": true,
+    "gateway": {
+      "MainPID": "3443258",
+      "NRestarts": "0",
+      "MemoryMax": "5368709120",
+      "TasksMax": "1024",
+      "ActiveState": "active"
+    },
+    "platforms": {
+      "telegram": "connected",
+      "api_server": "connected",
+      "photon": "connected"
+    },
+    "manager_heartbeat_fresh": true,
+    "api_health": "ok",
+    "watchdog_timer": {
+      "ActiveState": "active",
+      "UnitFileState": "enabled"
+    },
+    "limits": {
+      "agents": 10,
+      "api": 10,
+      "browsers": 2,
+      "manager_jobs": 3
+    },
+    "occupied_resource_leases": 0,
+    "checked_lock_files": {
+      "agents": 10,
+      "api": 10,
+      "browser": 2
+    },
+    "historical_jobs": 76,
+    "active_jobs": 0,
+    "deployed_hashes_match_tested_candidates": true
+  },
+  "limitations": [
+    "Captured Telegram routes; no external Telegram messages were sent or delivery tested.",
+    "Four bounded editorial fixtures do not guarantee every future source or model.",
+    "Existing direct-chat cached prompts need a fresh session; new manager workers receive the deployed policy."
+  ]
+}
