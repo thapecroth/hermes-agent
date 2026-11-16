@@ -44,17 +44,19 @@ async def main():
         home = Path(temp)
         store = Store(home / "runtime/resource-harness")
         runtime = GatewayRuntime(ctx, gateway, home, lambda: store)
-        jobs = [{"id": 1, "state": "running", "goal": "Compare local browser automation options", "result": ""},
-                {"id": 2, "state": "running", "goal": "Find Python CSV documentation", "result": ""}]
+        jobs = [{"id": 1, "title": "Browser Comparison", "state": "running", "goal": "Compare local browser automation options", "result": ""},
+                {"id": 2, "title": "Python CSV Docs", "state": "running", "goal": "Find Python CSV documentation", "result": ""}]
         examples = [("Also find SQLite transaction documentation as a separate task.", "new", None),
-                    ("For the browser comparison in J1, focus on local ARM64 support.", "steer", 1),
-                    ("Please cancel the Python CSV documentation job J2.", "cancel", 2)]
+                    ("For Browser Comparison, focus on local ARM64 support.", "steer", 1),
+                    ("Please cancel Python CSV Docs.", "cancel", 2)]
         decisions = []
         try:
             for text, action, target in examples:
                 value = await runtime.classify(text, jobs)
                 assert value.get("action") == action and (target is None or value.get("target") == target), value
-                decisions.append({"action": value["action"], "target": value.get("target")})
+                if action == "new":
+                    assert isinstance(value.get("title"), str) and 1 <= len(value["title"].split()) <= 3, value
+                decisions.append({"action": value["action"], "target": value.get("target"), "title": value.get("title")})
             route = {"session_key": "rh-live-manager-canary", "source": {"platform": "telegram",
                 "chat_type": "dm", "chat_id": "local-captured-canary", "user_id": "local-captured-canary"}}
             result = await asyncio.wait_for(runtime.execute({"id": 81001, "scope": "local-canary", "attempt": 0,

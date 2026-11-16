@@ -123,6 +123,8 @@ class ManagerTests(unittest.IsolatedAsyncioTestCase):
         delivery = getattr(manager, "delivery", None)
         if delivery is not None:
             tasks.add(delivery)
+        if manager.reviewing is not None:
+            tasks.add(manager.reviewing)
         for task in tasks:
             task.cancel()
         if tasks:
@@ -144,7 +146,7 @@ class ManagerTests(unittest.IsolatedAsyncioTestCase):
     async def new_job(self, goal, *, scope="chat-a", manager=None):
         manager = manager or self.manager
         reply = await self.admit("task: " + goal, scope=scope, manager=manager)
-        self.assertIn("Queued J", reply)
+        self.assertIn("New session:", reply)
         return manager.store.jobs(scope)[0]["id"]
 
     def job(self, job_id, *, scope="chat-a", manager=None):
@@ -173,7 +175,7 @@ class ManagerTests(unittest.IsolatedAsyncioTestCase):
         first = await self.new_job("Search the first topic")
         await self.start(first)
         status = await asyncio.wait_for(self.admit("status"), timeout=0.5)
-        self.assertIn(f"J{first} running", status)
+        self.assertIn(f"{self.job(first)['title']} running", status)
         second = await asyncio.wait_for(self.new_job("Search an independent topic"), timeout=0.5)
         await self.start(second)
         self.assertEqual(self.runtime.active, 2)
@@ -184,12 +186,12 @@ class ManagerTests(unittest.IsolatedAsyncioTestCase):
         text = "Research a separate topic as well"
         gate = self.runtime.block_classification(text, {"action": "new"})
         receipt = await self.admit(text)
-        self.assertIn("Received M", receipt)
+        self.assertEqual(receipt, "")
         await self.start(first)
         await asyncio.wait_for(self.runtime.classifying[text].wait(), timeout=1)
         status = await asyncio.wait_for(self.admit("status"), timeout=0.5)
-        self.assertIn(f"J{first} running", status)
-        self.assertIn("Routing pending: M", status)
+        self.assertIn(f"{self.job(first)['title']} running", status)
+        self.assertNotIn("Routing pending", status)
         self.assertEqual(len(self.manager.store.jobs("chat-a")), 1)
         gate.set()
         await asyncio.wait_for(asyncio.shield(self.manager.routers["chat-a"]), timeout=1)
@@ -198,10 +200,10 @@ class ManagerTests(unittest.IsolatedAsyncioTestCase):
     async def test_duplicate_platform_message_never_creates_or_executes_twice(self):
         reply = await self.admit("task: One request", message_id="platform-42")
         duplicate = await self.admit("task: One request", message_id="platform-42")
-        self.assertEqual(duplicate, reply)
+        self.assertEqual(duplicate, "")
         job_id = self.manager.store.jobs("chat-a")[0]["id"]
         await self.start(job_id)
-        self.assertEqual(await self.admit("task: One request", message_id="platform-42"), reply)
+        self.assertEqual(await self.admit("task: One request", message_id="platform-42"), "")
         self.assertEqual(len(self.manager.store.jobs("chat-a")), 1)
         self.assertEqual([job["id"] for job in self.runtime.executed], [job_id])
 
@@ -211,7 +213,7 @@ class ManagerTests(unittest.IsolatedAsyncioTestCase):
         gate = self.runtime.block_classification(text, {"action": "new", "goal": "rewritten"})
         await self.admit(text, message_id="pending-42")
         duplicate = await self.admit(text, message_id="pending-42")
-        self.assertIn("already received", duplicate)
+        self.assertEqual(duplicate, "")
         await self.manager.tick()
         await asyncio.wait_for(self.runtime.classifying[text].wait(), timeout=1)
         gate.set()
@@ -252,7 +254,7 @@ class ManagerTests(unittest.IsolatedAsyncioTestCase):
         await self.manager.tick()
         await asyncio.wait_for(self.runtime.classifying[text].wait(), timeout=1)
         receipt = await self.admit("cancel it")
-        self.assertIn("Received M", receipt)
+        self.assertEqual(receipt, "")
         self.assertEqual(self.job(old)["state"], "running")
         self.assertEqual(self.runtime.cancel_calls, [])
         await self.finish(old)
@@ -319,7 +321,7 @@ class ManagerTests(unittest.IsolatedAsyncioTestCase):
         await asyncio.wait_for(self.runtime.control_started.wait(), timeout=1)
         try:
             status = await asyncio.wait_for(self.admit("status"), timeout=0.5)
-            self.assertIn(f"J{job_id} cancelling", status)
+            self.assertIn(f"{self.job(job_id)['title']} cancelling", status)
             await asyncio.wait_for(self.new_job("New instruction during cancellation"), timeout=0.5)
             for _ in range(3):
                 await self.manager.tick()
@@ -389,7 +391,7 @@ class ManagerTests(unittest.IsolatedAsyncioTestCase):
         await self.start(queued, manager=restarted, runtime=runtime)
         self.assertEqual([job["id"] for job in runtime.executed], [queued])
         notices = restarted.store.rows("SELECT * FROM outbox")
-        self.assertTrue(any(f"J{interrupted}" in row["text"] and "restart" in row["text"] for row in notices))
+        self.assertTrue(any(self.job(interrupted)["title"] in row["text"] and "restart" in row["text"] for row in notices))
         self.assertEqual(len(self.runtime.executed), 1)
 
     async def test_failed_initial_steering_claim_rolls_back_without_stranding_job(self):
@@ -433,6 +435,157 @@ class ManagerTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("Routing is temporarily unavailable", saved["reply"])
         self.assertEqual(len(self.manager.store.jobs("chat-a")), 1)
         self.assertEqual(self.runtime.cancel_calls, [])
+
+    async def test_model_title_is_bounded_and_routing_stays_silent_until_decided(self):
+        text = "Please restore the browser login and verify it"
+        gate = self.runtime.block_classification(text, {"action": "new", "title": "Browser Login Restore Extra Words"})
+        self.assertEqual(await self.admit(text), "")
+        self.assertEqual(await self.admit(text, message_id=str(self.message_number)), "")
+        await self.manager.tick()
+        await asyncio.wait_for(self.runtime.classifying[text].wait(), timeout=1)
+        self.assertEqual(self.manager.store.jobs("chat-a"), [])
+        self.assertEqual(self.runtime.sent, [])
+        gate.set()
+        await asyncio.wait_for(asyncio.shield(self.manager.routers["chat-a"]), timeout=1)
+        job = self.manager.store.jobs("chat-a")[0]
+        self.assertEqual(job["title"], "Browser Login Restore")
+        self.assertEqual(job["goal"], text)
+        self.assertEqual(self.manager.store.rows("SELECT text FROM outbox")[0]["text"], "New session: Browser Login Restore.")
+
+    async def test_titles_are_reusable_but_internal_task_and_run_ids_are_distinct(self):
+        first = await self.new_job("Browser Login")
+        await self.start(first)
+        await self.finish(first)
+        reply = await self.admit("continue browser login")
+        resumed = self.manager.store.jobs("chat-a")[0]
+        import json
+        self.assertEqual(reply, "New session: Browser Login.")
+        self.assertNotEqual(resumed["id"], first)
+        self.assertEqual(resumed["task_key"], self.job(first)["task_key"])
+        self.assertEqual(json.loads(resumed["route"])["reference_jobs"], [first])
+        await self.admit("steer BROWSER LOGIN: use the existing credentials")
+        self.assertEqual(self.manager.store.rows("SELECT job_id,text FROM steers"),
+                         [{"job_id": resumed["id"], "text": "use the existing credentials"}])
+        other = await self.new_job("Browser Login")
+        self.assertNotEqual(self.job(other)["task_key"], resumed["task_key"])
+        reply = await self.admit("cancel Browser Login")
+        self.assertIn("No unique active job", reply)
+        self.assertEqual(self.job(other)["state"], "queued")
+        self.assertEqual(self.job(resumed["id"])["state"], "queued")
+
+    async def test_named_controls_are_scoped_to_chat_and_keep_title_through_restart(self):
+        own = await self.new_job("Browser Login")
+        foreign = await self.new_job("Browser Login", scope="chat-b")
+        reply = await self.admit("cancel browser login")
+        self.assertIn("Browser Login cancelled", reply)
+        self.assertEqual(self.job(own)["state"], "cancelled")
+        self.assertEqual(self.job(foreign, scope="chat-b")["state"], "queued")
+        restarted, _ = self.make_manager(root=self.root)
+        self.assertEqual(self.job(own, manager=restarted)["title"], "Browser Login")
+        self.assertEqual(self.job(own, manager=restarted)["task_key"], self.job(own)["task_key"])
+
+    async def test_completed_task_is_classified_even_with_no_active_jobs(self):
+        first = await self.new_job("Browser Login")
+        await self.start(first)
+        await self.finish(first)
+        text = "Try that same login again with the new account"
+        self.runtime.directives[text] = {"action": "new", "target": first, "title": "Different Generated Title"}
+        self.assertEqual(await self.admit(text), "")
+        await self.manager.tick()
+        await asyncio.wait_for(asyncio.shield(self.manager.routers["chat-a"]), timeout=1)
+        resumed = self.manager.store.jobs("chat-a")[0]
+        self.assertEqual(resumed["title"], "Browser Login")
+        self.assertEqual(resumed["task_key"], self.job(first)["task_key"])
+        self.assertEqual(resumed["goal"], text)
+
+    async def test_legacy_database_gets_stable_titles_and_unique_task_keys(self):
+        import sqlite3
+        legacy = self.root / "legacy"
+        legacy.mkdir()
+        with sqlite3.connect(legacy / "manager.sqlite3") as db:
+            db.execute("CREATE TABLE jobs(id INTEGER PRIMARY KEY,scope TEXT,route TEXT,goal TEXT,state TEXT,result TEXT,created REAL,updated REAL)")
+            db.execute("INSERT INTO jobs VALUES(1,'chat-a','{}','Please fix the browser login','completed','ok',1,1)")
+        store = manager_module.Store(legacy)
+        migrated = store.get("chat-a", 1)
+        self.assertEqual(migrated["title"], "fix browser login")
+        self.assertEqual(len(migrated["task_key"]), 32)
+        self.assertEqual(manager_module.Store(legacy).get("chat-a", 1), migrated)
+
+    async def test_skill_review_interval_accumulates_across_workers_and_is_chat_scoped(self):
+        store = self.manager.store
+        self.assertIsNone(store.skill_review_due("chat-a", 1, 2, 5))
+        self.assertIsNone(store.skill_review_due("chat-b", 2, 4, 5))
+        self.assertEqual(store.skill_review_due("chat-a", 3, 3, 5), 0)
+        self.assertIsNone(store.skill_review_due("chat-a", 4, 4, 5))
+        self.assertEqual(store.skill_review_due("chat-a", 5, 1, 5), 3)
+
+    async def test_review_runs_after_result_and_does_not_hold_manager_intake(self):
+        reviewed = asyncio.Event()
+        release = asyncio.Event()
+        async def review(job):
+            self.assertEqual(self.job(job["id"])["state"], "completed")
+            self.manager.store.notice(job, "Skill 'fixture-skill' updated.")
+            reviewed.set()
+            await release.wait()
+            return "reviewed"
+        self.runtime.review = review
+        first = await self.new_job("Browser Login")
+        await self.start(first)
+        await self.finish(first)
+        await self.manager.tick()
+        await asyncio.wait_for(reviewed.wait(), timeout=1)
+        try:
+            notices = self.manager.store.rows("SELECT text FROM outbox")
+            self.assertIn("Browser Login completed", notices[0]["text"])
+            self.assertEqual(notices[1]["text"], "Browser Login\nSkill 'fixture-skill' updated.")
+            second = await asyncio.wait_for(self.new_job("Independent work"), timeout=.5)
+            await self.start(second)
+            self.assertEqual(self.job(second)["state"], "running")
+        finally:
+            release.set()
+            await asyncio.wait_for(self.manager.reviewing, timeout=1)
+
+    async def test_restart_does_not_replay_uncertain_skill_review(self):
+        job = await self.new_job("Browser Login")
+        await self.start(job)
+        await self.finish(job)
+        with self.manager.store.db() as db:
+            db.execute("UPDATE skill_reviews SET state='running'")
+        restarted, _ = self.make_manager(root=self.root)
+        self.assertEqual(restarted.store.rows("SELECT state FROM skill_reviews"), [{"state": "interrupted"}])
+
+    async def test_independent_context_reference_does_not_reuse_task_identity(self):
+        import json
+        first = await self.new_job("Browser Login")
+        await self.start(first)
+        await self.finish(first)
+        text = f"Audit J{first} output as a separate task"
+        self.runtime.directives[text] = {"action": "new", "title": "Output Audit"}
+        await self.admit(text)
+        await self.manager.tick()
+        await asyncio.wait_for(asyncio.shield(self.manager.routers["chat-a"]), timeout=1)
+        separate = self.manager.store.jobs("chat-a")[0]
+        self.assertEqual(separate["title"], "Output Audit")
+        self.assertNotEqual(separate["task_key"], self.job(first)["task_key"])
+        self.assertEqual(json.loads(separate["route"])["reference_jobs"], [first])
+
+    async def test_skill_notice_waits_for_failed_result_delivery_and_retry(self):
+        job_id = await self.new_job("Browser Login")
+        await self.start(job_id)
+        await asyncio.wait_for(asyncio.shield(self.manager.delivery), timeout=1)
+        await self.finish(job_id)
+        self.manager.store.notice(self.job(job_id), "Skill updated.")
+        self.runtime.send_results.extend([False, True, True])
+        await self.manager.deliver()
+        await self.manager.deliver()
+        self.assertEqual(len(self.runtime.sent), 1, "notice bypassed result retry backoff")
+        with self.manager.store.db() as db:
+            db.execute("UPDATE outbox SET next_try=0")
+        await self.manager.deliver()
+        await self.manager.deliver()
+        self.assertEqual(len(self.runtime.sent), 3)
+        self.assertIn("Browser Login completed", self.runtime.sent[1][1])
+        self.assertEqual(self.runtime.sent[2][1], "Browser Login\nSkill updated.")
 
 
 if __name__ == "__main__":

@@ -12,7 +12,9 @@ The scheduler also bootstraps when plugin discovery precedes gateway initializat
 recovery and pending notifications do not need another incoming Telegram message.
 New work starts in a delegated worker. A small routing model distinguishes another
 independent task from steering, cancellation, or status; ambiguous controls ask for a
-job number. Deterministic controls and status avoid model latency. Three top-level jobs
+task description. Admission and duplicate deliveries produce no preliminary processing
+or receipt message: only the completed routing decision is announced. Deterministic
+controls and status avoid model latency. Three top-level jobs
 run together by default, leaving capacity for research children inside the shared
 10-agent, 10-API/search-call, and two-browser budgets. Excess jobs queue durably; the
 per-chat queue is bounded to 50 waiting jobs plus active capacity. Attachment paths,
@@ -20,17 +22,28 @@ images, and replied-to message text are passed to workers too.
 
 Examples:
 
-- Send an ordinary request: it becomes `J1`, `J2`, and so on.
+- Send an ordinary request: the routing model assigns a task summary of at most three
+  words, such as `Browser Login`. Explicit new tasks use a local keyword summary.
 - `task: compare these alternatives` or `/task compare these alternatives`: explicitly start another job.
-- `steer J1: focus on local options` or `/job_steer J1: focus on local options`: steer a selected job.
-- `cancel J2` or `/cancel J2`: cancel only that job. Confirmation follows actual worker termination.
+- `steer Browser Login: use the existing account` or `/job_steer Browser Login: use the existing account`: steer a selected job.
+- `cancel Browser Login` or `/cancel Browser Login`: cancel only that job. Confirmation follows actual worker termination.
 - `cancel all`, `/cancel all`, or native `/stop`: request cancellation of this chat's active jobs.
 - `status` or `/jobs`: get saved job states while workers or the classifier are busy.
-- `continue J1`: start a new job with J1's saved goal/result attached as context.
+- `continue Browser Login`: steer its active execution, or start a continuation with
+  its saved goal/result attached, keeping its title and task lineage.
+
+Titles are display labels, not database keys. Every execution has a separate immutable
+integer ID, and continuations share an internal random task key. Unrelated tasks may
+reuse the same title without sharing identity. Ambiguous title controls ask for task
+details instead of selecting a job arbitrarily. Title lookup and model routing stay
+inside the current chat; legacy `J1` controls remain accepted. Migration backfills
+titles and task keys once for existing jobs, preserving their execution IDs.
 
 Workers have separate consent queues. Approval prompts name both the job and the
-specific request: `/job_approve J1 <request ID>` grants that operation once;
-`/job_deny J1 <request ID> [reason]` denies it. A request from another chat cannot
+specific request: `/job_approve <request ID>` grants that operation once;
+`/job_deny <request ID> [reason]` denies it. The correlated request token is resolved
+against this chat's actual pending consent queues, independently of reusable titles.
+A request from another chat cannot
 resolve the approval. Ordinary `/approve` and `/deny` retain the core chat behavior.
 Finishing a normal gateway turn cannot withdraw another job's approval requests.
 Never use an unqualified natural-language acknowledgement as execution consent.
@@ -44,6 +57,29 @@ a send but before local acknowledgement can duplicate a notification. It never r
 that notification's underlying task. Plugin slash dispatch lacks the platform message
 ID on this runtime, so slash-created tasks do not have the ordinary inbox's platform
 replay protection. Prefer ordinary `task: ...` messages when that matters.
+
+## Skill improvement in manager mode
+
+The installed core suppresses automatic reviews inside delegated children. The manager
+therefore schedules its own native skill review after successful jobs. One review runs
+at a time, starting after foreground jobs and routing settle; it never occupies the
+main chat's turn. The coordinator's session row is explicitly persisted before delegation
+so saved child transcripts retain the parent relationship required for review and recovery.
+
+The manager respects `auxiliary.background_review.enabled`, enabled skill tools, and
+`skills.creation_nudge_interval` (zero disables the trigger). The iteration budget persists
+per chat across short workers and restarts, and includes earlier completed task summaries
+when the interval is reached. Review execution uses the installed core's runtime resolution,
+read-before-write checks, tool whitelist, and cancellation lifecycle. It consumes one of
+the shared ten agent slots; each provider call uses the shared API admission pool.
+
+Only confirmed skill changes enqueue a titled notification. No-change, rejected, disabled,
+or cancelled reviews produce no success notice. Notices depend on result delivery, so a
+result retry cannot let its skill notice overtake it. Native `/stop` fences pending reviews
+and cancels a running review outside the gateway loop. New work can create new reviews.
+Shutdown fences review construction and admission; the owning worker closes its resources.
+An interrupted running review is retained as interrupted and is not automatically replayed,
+because it may already have changed a shared skill file.
 
 ## Resource recovery
 
@@ -95,7 +131,9 @@ python -m unittest discover -s contrib/resource-harness/tests -v
 
 Run `e2e_manager.py <receipt.json>` using the installed Hermes Python and checkout.
 It exercises real gateway admission/plugin discovery, real AIAgent/delegation, steering,
-cancellation, job-specific consent, media intake, deduplication, and resource cleanup.
+cancellation, job-specific consent, media intake, deduplication, titled continuation,
+silent intake, native skill-file edits and notices, rejected patches, disabled reviews,
+review cancellation, and resource cleanup.
 Provider responses are deterministic fixtures and Telegram sends are captured locally.
 `e2e_watchdog.py <receipt.json>` uses a disposable real systemd service and a deliberately
 low test pressure threshold to prove restart, warning delivery, continuation, and an
@@ -105,3 +143,8 @@ unrepeated side effect without exhausting memory or restarting the actual gatewa
 After deployment, verify the real service's startup manager task, connected adapters,
 HTTP health, watchdog timer, effective cgroup limits, and pool cleanup. These captured
 Telegram tests do not prove delivery through Telegram's external network.
+
+The [manager title and skill-review receipt](manager-titles-qualification-20261115.json)
+records the installed-core fixture, live-provider canary, serving-state checks, and
+the separate fork-core test baseline. Fixture admission timings measure local intake;
+they do not measure Telegram network or model routing latency.

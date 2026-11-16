@@ -71,12 +71,19 @@ async def qualify(source, home):
     classifier_inputs = []
     worker_approval_keys = {}
     interrupted = {}
+    review_calls = defaultdict(int)
+    review_modes = []
+    review_entered = threading.Event()
+    review_release = threading.Event()
+    active_review = []
+    skill_file = home / "skills/fixture-learning/SKILL.md"
 
-    def completion(text=None, tool=None):
+    def completion(text=None, tool=None, arguments=None):
         message = {"role": "assistant", "content": text}
         if tool:
             message["tool_calls"] = [{"id": "fixture-call", "type": "function", "function": {
-                "name": "terminal", "arguments": json.dumps({"command": "printf 'fixture-safe-boundary'", "timeout": 5})}}]
+                "name": tool if isinstance(tool, str) else "terminal", "arguments": json.dumps(arguments or {
+                    "command": "printf 'fixture-safe-boundary'", "timeout": 5})}}]
         return ChatCompletion.model_validate({"id": "fixture", "object": "chat.completion", "created": 1,
             "model": "gpt-4.1-mini", "choices": [{"index": 0, "message": message,
             "finish_reason": "tool_calls" if tool else "stop"}],
@@ -85,6 +92,31 @@ async def qualify(source, home):
     def provider(agent, kwargs, *args, **kw):
         from tools.approval_context import get_current_session_key
         messages = kwargs.get("messages", [])
+        if getattr(agent, "_turn_origin", None) == "background_review":
+            identity = agent.session_id
+            review_calls[identity] += 1
+            count = review_calls[identity]
+            mode = ("cancel" if "CANCEL_SKILL_REVIEW" in json.dumps(messages) else
+                    "reject" if "REJECT_SKILL_PATCH" in json.dumps(messages) else
+                    "update" if "E2E_SKILL" in json.dumps(messages) else "noop")
+            if count == 1:
+                review_modes.append(mode)
+            if mode == "cancel":
+                active_review.append(agent)
+                review_entered.set()
+                assert review_release.wait(25), "review cancellation fixture timed out"
+                if agent.is_interrupted:
+                    raise InterruptedError("review observed the stop fence")
+                return completion("Nothing to save.")
+            if mode == "noop":
+                return completion("Nothing to save.")
+            if count == 1:
+                return completion(tool="skill_view", arguments={"name": "fixture-learning"})
+            if count == 2:
+                return completion(tool="skill_manage", arguments={"action": "patch", "name": "fixture-learning",
+                    "old_string": "MISSING_MARKER" if mode == "reject" else "BEFORE_MANAGER_LEARNING",
+                    "new_string": "AFTER_MANAGER_LEARNING"})
+            return completion("Skill review finished.")
         users = [str(m.get("content", "")) for m in messages if m.get("role") == "user"]
         initial = users[0] if users else ""
         label = "B" if "E2E_JOB_B" in initial else "A" if "E2E_JOB_A" in initial else "MEDIA"
@@ -109,7 +141,7 @@ async def qualify(source, home):
         elif "cancel the second" in payload:
             directive = {"action": "cancel", "target": 2}
         else:
-            directive = {"action": "new"}
+            directive = {"action": "new", "title": "Research Beta" if "E2E_JOB_B" in payload else "Research Alpha"}
         return "fixture", "fixture", completion(json.dumps(directive))
 
     spec = importlib.util.spec_from_file_location("manager_e2e_store", source / "manager.py")
@@ -151,15 +183,16 @@ async def qualify(source, home):
             pulse = home / "runtime/resource-harness/manager-status.json"
             await until(pulse.exists, "early-discovered manager did not bootstrap before intake")
             reply, first_latency = await inbound("E2E_JOB_A", "m1")
-            assert "Queued J1" in reply, reply
+            assert not reply, reply
             await until(lambda: entered["A"].is_set(), "real delegated worker A did not start")
+            assert job(1)["title"] == "Research Alpha", job(1)
             reply, second_latency = await inbound("Also do independent E2E_JOB_B", "m2")
-            assert "Received" in reply, reply
+            assert not reply, reply
             await until(lambda: entered["B"].is_set(), "independent real worker B did not start")
             await inbound("Add STEER_MARKER to the first job", "m3")
             await until(lambda: bool(store.rows("SELECT * FROM steers WHERE job_id=1 AND delivered=1")), "steering never reached live child")
             reply, status_latency = await inbound("status", "m4")
-            assert "J1 running" in reply and "J2 running" in reply, reply
+            assert "Research Alpha running" in reply and "Research Beta running" in reply, reply
 
             # Exercise the actual approval queues while a normal turn registers and
             # unregisters its own notifier. Only custom job commands resolve these.
@@ -175,11 +208,11 @@ async def qualify(source, home):
             approval.unregister_gateway_notify(key)
             assert all(not e.event.is_set() for e in entries.values()), "ordinary turn withdrew job approval"
             other = SessionSource(platform=Platform.TELEGRAM, user_id="other-user", chat_id="other-chat", chat_type="dm")
-            reply, _ = await inbound("/job_approve J1 fixture-1", "foreign-approval", source=other)
+            reply, _ = await inbound("/job_approve fixture-1", "foreign-approval", source=other)
             assert "No active job" in reply and not entries[1].event.is_set(), reply
-            reply, _ = await inbound("/job_approve J1 fixture-1", "approval-1")
+            reply, _ = await inbound("/job_approve fixture-1", "approval-1")
             assert entries[1].result == "once" and not entries[2].event.is_set(), reply
-            reply, _ = await inbound("/job_deny J2 fixture-2 fixture refusal", "deny-2")
+            reply, _ = await inbound("/job_deny fixture-2 fixture refusal", "deny-2")
             assert entries[2].result == "deny" and entries[2].reason == "fixture refusal", reply
 
             await inbound("Please cancel the second job", "m5")
@@ -199,7 +232,94 @@ async def qualify(source, home):
             await inbound("task: Summarize attachment", "media", media_urls=[str(attachment)], media_types=["text/plain"])
             await until(lambda: job(3).get("state") == "completed", "media task did not finish in worker")
             assert json.loads(job(3)["route"])["attachments"][0]["path"] == str(attachment)
+            await until(lambda: all(r["state"] == "completed" for r in store.rows("SELECT state FROM skill_reviews")),
+                        "initial completed jobs were not reviewed")
+            # Reuse a display title and task lineage without reusing a run ID.
+            await inbound("continue Research Alpha", "resume")
+            await until(lambda: job(4).get("state") == "completed", "titled continuation failed")
+            assert job(4)["title"] == job(1)["title"] and job(4)["task_key"] == job(1)["task_key"]
+            assert json.loads(job(4)["route"])["reference_jobs"] == [1]
+            await until(lambda: store.rows("SELECT state FROM skill_reviews WHERE job_id=4")[0]["state"] == "completed",
+                        "continuation review did not finish")
+            # Real native review, real skill tools, durable notices; no live skills or messages.
+            assert "BEFORE_MANAGER_LEARNING" in skill_file.read_text()
+            await inbound("task: E2E_SKILL capture the reusable lesson", "skill-change")
+            await until(lambda: job(5).get("state") == "completed", "skill fixture task did not finish")
+            await until(lambda: "AFTER_MANAGER_LEARNING" in skill_file.read_text(), "native review did not update the real isolated skill")
+            await until(lambda: any("fixture-learning" in row["text"] for row in captured), "skill notice did not reach captured Telegram adapter")
+            notices = [r for r in captured if "fixture-learning" in r["text"]]
+            assert len(notices) == 1 and notices[0]["text"].startswith(job(5)["title"] + "\n"), notices
+            result_position = next(i for i, row in enumerate(captured) if row["text"].startswith(job(5)["title"] + " completed"))
+            assert result_position < captured.index(notices[0]), "review notice preceded task result"
+            await inbound("task: REJECT_SKILL_PATCH verify failed update", "skill-reject")
+            await until(lambda: job(6).get("state") == "completed", "rejected patch task did not finish")
+            await until(lambda: store.rows("SELECT state FROM skill_reviews WHERE job_id=6")[0]["state"] == "completed",
+                        "rejected patch review did not settle")
+            assert "reject" in review_modes and "update" in review_modes, review_modes
+            assert len([r for r in captured if "fixture-learning" in r["text"]]) == 1, "failed review claimed a skill change"
+            await inbound("task: CANCEL_SKILL_REVIEW check stop", "review-cancel-task")
+            await until(review_entered.is_set, "cancellation review did not start")
+            # Exercise the native /stop pre-command hook. Its cancellation waits
+            # run outside the gateway loop while the reviewer owns its resources.
+            from hermes_cli.lifecycle import invoke_hook
+            before_stop = time.monotonic()
+            invoke_hook("pre_command", command="stop", session_key=key, platform="telegram")
+            assert time.monotonic() - before_stop < 1, "review stop blocked the gateway loop"
+            await until(lambda: active_review[0].is_interrupted, "native stop did not interrupt active review")
+            review_release.set()
+            await until(lambda: store.rows("SELECT state FROM skill_reviews WHERE job_id=7")[0]["state"] == "completed",
+                        "stopped review did not settle")
+            assert len([r for r in captured if "fixture-learning" in r["text"]]) == 1, "cancelled review claimed a skill change"
+            import yaml
+            config = yaml.safe_load((home / "config.yaml").read_text())
+            config.setdefault("auxiliary", {})["background_review"] = {"enabled": False}
+            (home / "config.yaml").write_text(yaml.safe_dump(config))
+            before_disabled = len(review_modes)
+            await inbound("task: Review Disabled", "skill-disabled")
+            await until(lambda: job(8).get("state") == "completed", "disabled-review task did not finish")
+            await until(lambda: store.rows("SELECT state FROM skill_reviews WHERE job_id=8")[0]["state"] == "completed",
+                        "disabled review did not settle")
+            assert store.rows("SELECT result FROM skill_reviews WHERE job_id=8")[0]["result"] == "disabled"
+            assert len(review_modes) == before_disabled, "disabled native review made a provider call"
+            config["auxiliary"]["background_review"]["enabled"] = True
+            (home / "config.yaml").write_text(yaml.safe_dump(config))
+            await inbound("task: Post Stop Work", "post-stop")
+            await until(lambda: job(9).get("state") == "completed", "new work after review stop did not finish")
+            await until(lambda: store.rows("SELECT state FROM skill_reviews WHERE job_id=9")[0]["state"] == "completed",
+                        "new review after stop did not finish")
+            assert store.rows("SELECT result FROM skill_reviews WHERE job_id=9")[0]["result"] == "reviewed"
+            # Stop at both startup boundaries: before parent registration and
+            # after registration while admission has not returned. Neither may
+            # start a review fork after shutdown or close it from a foreign thread.
+            for phase in ("construction", "admission"):
+                runtime = loaded.module.manager_runtime.GatewayRuntime(
+                    SimpleNamespace(get_config=lambda key, default: default), runner, home, lambda: store)
+                blocked, unblock = threading.Event(), threading.Event()
+                original_parent = runtime.new_parent
+                original_acquire = loaded.module.pool.Pool.acquire
+                def held_parent(*args, **kwargs):
+                    parent = original_parent(*args, **kwargs)
+                    blocked.set()
+                    assert unblock.wait(20), "parent construction gate timed out"
+                    return parent
+                def held_admission(pool, owner, *args, **kwargs):
+                    if owner == "manager-skill-review-9":
+                        blocked.set()
+                        assert unblock.wait(20), "review admission gate timed out"
+                    return original_acquire(pool, owner, *args, **kwargs)
+                before_shutdown = len(review_modes)
+                with patch.object(runtime, "new_parent", held_parent if phase == "construction" else original_parent), \
+                     patch.object(loaded.module.pool.Pool, "acquire", held_admission if phase == "admission" else original_acquire):
+                    pending_review = asyncio.create_task(runtime.review(job(9)))
+                    try:
+                        await until(blocked.is_set, "shutdown boundary was not reached")
+                        runtime.close()
+                    finally:
+                        unblock.set()
+                    assert await asyncio.wait_for(pending_review, 15) == "stopped"
+                    assert not runtime.review_parents and len(review_modes) == before_shutdown
             await until(lambda: all(j["state"] == "sent" for j in store.rows("SELECT state FROM outbox")), "outbox did not drain")
+            assert not any("Received M" in r["text"] or "I’m routing" in r["text"] for r in captured), captured
             runner._handle_message_with_agent.assert_not_awaited()
             runner._enqueue_fifo.assert_not_called()
             pool = loaded.module.pool
@@ -207,12 +327,20 @@ async def qualify(source, home):
             return {"passed": True, "real_hermes_admission_and_delegation": True,
                 "provider": "deterministic fixture", "telegram_delivery": "captured adapter; no external sends",
                 "early_discovery_bootstrap_before_intake": True,
-                "jobs": [{"id": n, "state": job(n)["state"]} for n in (1, 2, 3)],
+                "jobs": [{"id": n, "title": job(n)["title"], "state": job(n)["state"]} for n in range(1, 10)],
                 "latency_seconds": {"first": round(first_latency, 3), "while_worker_running": round(second_latency, 3), "status": round(status_latency, 3)},
                 "steering_applied": True, "selected_cancellation": True, "approval_isolation": True,
                 "media_delegated": True, "deduplication": True, "main_agent_calls": 0,
+                "silent_intake": True, "three_word_titles": all(len(job(n)["title"].split()) <= 3 for n in range(1, 10)),
+                "reused_title_and_task_lineage": True, "native_skill_review_updated_file": True,
+                "skill_notice_delivered_after_result": True, "failed_patch_did_not_notify": True,
+                "disabled_review_made_no_provider_call": True,
+                "stop_interrupts_native_review": True, "new_work_and_review_after_stop": True,
+                "shutdown_fences_review_construction_and_admission": True,
+                "review_modes": review_modes,
                 "remaining_leases": pool.occupied(home / "runtime/resource-harness")}
         finally:
+            review_release.set()
             for gate in gates.values():
                 gate.set()
             manager.unload()
@@ -237,10 +365,16 @@ def main():
             "delegation": {"max_spawn_depth": 2, "orchestrator_enabled": True, "max_iterations": 8},
             "terminal": {"backend": "local", "cwd": str(home)},
             "memory": {"memory_enabled": False, "user_profile_enabled": False},
+            "skills": {"creation_nudge_interval": 1},
         }))
+        skill = home / "skills/fixture-learning/SKILL.md"
+        skill.parent.mkdir(parents=True)
+        skill.write_text("---\nname: fixture-learning\ndescription: Isolated manager skill-learning fixture.\n---\n"
+                         "# Fixture Learning\n\nBEFORE_MANAGER_LEARNING\n")
         receipt = asyncio.run(qualify(source, home))
         artifact.write_text(json.dumps(receipt, indent=2) + "\n")
         print(json.dumps(receipt), flush=True)
+        shutil.rmtree(home)
     except BaseException:
         print("Failed E2E fixtures retained at", home, flush=True)
         raise

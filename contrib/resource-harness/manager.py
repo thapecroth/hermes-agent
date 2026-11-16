@@ -17,6 +17,21 @@ log = logging.getLogger(__name__)
 ACTIVE = ("queued", "running", "cancelling")
 
 
+def task_title(value=None, goal=""):
+    """A display label, never an identity or an authorization key."""
+    words = re.findall(r"[^\W_]+(?:[-'][^\W_]+)*", value if isinstance(value, str) else "", re.UNICODE)
+    if not words:
+        ignored = {"a", "an", "the", "please", "can", "could", "would", "you", "i", "me", "my",
+                   "help", "with", "to", "for", "of", "and", "it", "that", "this", "task"}
+        words = [word for word in re.findall(r"[^\W_]+(?:[-'][^\W_]+)*", goal, re.UNICODE)
+                 if word.casefold() not in ignored]
+    return " ".join(word[:30] for word in words[:3]) or "New Task"
+
+
+def label(job):
+    return task_title(job.get("title"), job.get("goal", ""))
+
+
 class Store:
     def __init__(self, root: Path):
         root.mkdir(parents=True, exist_ok=True)
@@ -45,12 +60,29 @@ class Store:
                     reason TEXT NOT NULL, state TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS recovery_jobs (
                     recovery_id TEXT NOT NULL, job_id INTEGER NOT NULL, attempt INTEGER NOT NULL);
+                CREATE TABLE IF NOT EXISTS skill_reviews (
+                    job_id INTEGER PRIMARY KEY, state TEXT NOT NULL DEFAULT 'pending', result TEXT);
+                CREATE TABLE IF NOT EXISTS skill_review_budget (
+                    scope TEXT PRIMARY KEY, iterations INTEGER NOT NULL DEFAULT 0,
+                    since_job INTEGER NOT NULL DEFAULT 0);
             """)
             columns = {r[1] for r in db.execute("PRAGMA table_info(jobs)")}
             if "attempt" not in columns:
                 db.execute("ALTER TABLE jobs ADD COLUMN attempt INTEGER NOT NULL DEFAULT 0")
             if "recovery_context" not in columns:
                 db.execute("ALTER TABLE jobs ADD COLUMN recovery_context TEXT NOT NULL DEFAULT ''")
+            if "title" not in columns:
+                db.execute("ALTER TABLE jobs ADD COLUMN title TEXT NOT NULL DEFAULT ''")
+            if "task_key" not in columns:
+                db.execute("ALTER TABLE jobs ADD COLUMN task_key TEXT NOT NULL DEFAULT ''")
+            outbox_columns = {r[1] for r in db.execute("PRAGMA table_info(outbox)")}
+            if "job_id" not in outbox_columns:
+                db.execute("ALTER TABLE outbox ADD COLUMN job_id INTEGER")
+            if "after_id" not in outbox_columns:
+                db.execute("ALTER TABLE outbox ADD COLUMN after_id INTEGER")
+            for row in db.execute("SELECT id,goal,title,task_key FROM jobs WHERE title='' OR task_key=''").fetchall():
+                db.execute("UPDATE jobs SET title=?,task_key=? WHERE id=?",
+                           (task_title(row["title"], row["goal"]), row["task_key"] or uuid.uuid4().hex, row["id"]))
             recovery_columns = {r[1] for r in db.execute("PRAGMA table_info(recoveries)")}
             if "target_pid" not in recovery_columns:
                 db.execute("ALTER TABLE recoveries ADD COLUMN target_pid INTEGER NOT NULL DEFAULT 0")
@@ -93,7 +125,29 @@ class Store:
         rows = self.rows("SELECT * FROM jobs WHERE scope=? AND id=?", (scope, job_id))
         return rows[0] if rows else None
 
-    def finish_message(self, event, reply, *, notify=False, create=None, control=None):
+    def named(self, scope, title, *, active=False):
+        return self.rows("SELECT * FROM jobs WHERE scope=? AND title=? COLLATE NOCASE " +
+                         ("AND state IN ('queued','running','cancelling') " if active else "") +
+                         "ORDER BY id DESC", (scope, title.strip()))
+
+    def notice(self, job, text):
+        with self.db() as db:
+            preceding = db.execute("SELECT id FROM outbox WHERE job_id=? ORDER BY id DESC LIMIT 1", (job["id"],)).fetchone()
+            db.execute("INSERT INTO outbox(route,text,job_id,after_id) VALUES(?,?,?,?)",
+                       (job["route"], f"{label(job)}\n{text}", job["id"], preceding["id"] if preceding else None))
+
+    def skill_review_due(self, scope, job_id, iterations, interval):
+        """Carry the configured skill cadence across short, independent workers."""
+        with self.db() as db:
+            db.execute("INSERT OR IGNORE INTO skill_review_budget(scope) VALUES(?)", (scope,))
+            row = db.execute("SELECT * FROM skill_review_budget WHERE scope=?", (scope,)).fetchone()
+            total = row["iterations"] + iterations
+            due = total >= interval
+            db.execute("UPDATE skill_review_budget SET iterations=?,since_job=? WHERE scope=?",
+                       (total % interval if due else total, job_id if due else row["since_job"], scope))
+            return row["since_job"] if due else None
+
+    def finish_message(self, event, reply, *, notify=False, create=None, title=None, task_key=None, control=None):
         """The routing decision and its visible reply commit with the job/control effect."""
         with self.db() as db:
             current = db.execute("SELECT state FROM inbox WHERE id=?", (event["id"],)).fetchone()
@@ -101,9 +155,10 @@ class Store:
                 return
             if create is not None:
                 now = time.time()
-                cursor = db.execute("INSERT INTO jobs(scope,route,goal,created,updated) VALUES(?,?,?,?,?)",
-                                    (event["scope"], event["route"], create, now, now))
-                reply = f"Queued J{cursor.lastrowid}: {create[:120]}"
+                title = task_title(title, create)
+                db.execute("INSERT INTO jobs(scope,route,goal,created,updated,title,task_key) VALUES(?,?,?,?,?,?,?)",
+                           (event["scope"], event["route"], create, now, now, title, task_key or uuid.uuid4().hex))
+                reply = f"New session: {title}."
             if control:
                 action, job_id, text = control
                 for target in job_id if isinstance(job_id, list) else [job_id]:
@@ -140,6 +195,9 @@ class Store:
     def recover(self):
         """Only a fresh, issued watchdog ticket authorizes automatic continuation."""
         with self.db() as db:
+            # A review might already have written a skill before a crash. Do not
+            # silently replay uncertain shared-file changes on restart.
+            db.execute("UPDATE skill_reviews SET state='interrupted' WHERE state='running'")
             tickets = db.execute("SELECT * FROM recoveries WHERE state='issued' AND source_pid!=? AND created>? "
                                  "AND target_pid IN (0,?) AND (target_invocation='' OR target_invocation=?)",
                                  (os.getpid(), time.time() - 600, os.getpid(), os.environ.get("INVOCATION_ID", ""))).fetchall()
@@ -186,7 +244,7 @@ class Store:
                 db.execute("UPDATE jobs SET state=?,result=?,updated=? WHERE id=?",
                            (state, result, time.time(), row["id"]))
                 db.execute("INSERT INTO outbox(route,text) VALUES(?,?)",
-                           (row["route"], f"J{row['id']}: {result}"))
+                           (row["route"], f"{label(dict(row))}: {result}"))
             for ticket in tickets:
                 db.execute("UPDATE recoveries SET state='consumed' WHERE id=?", (ticket["id"],))
             db.execute("UPDATE recoveries SET state='expired' WHERE state IN ('prepared','issued') AND created<?",
@@ -203,8 +261,10 @@ class Store:
                 result += "\n\nSteering arrived too late to deliver: " + "; ".join(r["text"] for r in pending)
             db.execute("UPDATE jobs SET state=?,result=?,updated=? WHERE id=?",
                        (state, result, time.time(), job["id"]))
-            db.execute("INSERT INTO outbox(route,text) VALUES(?,?)",
-                       (job["route"], f"J{job['id']} {state}\n{result}"))
+            db.execute("INSERT INTO outbox(route,text,job_id) VALUES(?,?,?)",
+                       (job["route"], f"{label(job)} {state}\n{result}", job["id"]))
+            if state == "completed":
+                db.execute("INSERT OR IGNORE INTO skill_reviews(job_id) VALUES(?)", (job["id"],))
 
 
 def explicit(text):
@@ -223,6 +283,15 @@ def explicit(text):
     match = re.fullmatch(r"/?(?:task|new task|another task)\s*:\s*(.+)", value, re.I | re.S)
     if match:
         return {"action": "new", "goal": match[1]}
+    match = re.fullmatch(r"/?(?:steer|update)\s+([^:\n]+):\s*(.+)", value, re.I | re.S)
+    if match and len(match[1].split()) <= 3:
+        return {"action": "steer", "target": match[1].strip(), "message": match[2]}
+    match = re.fullmatch(r"/?(?:cancel|stop|continue|resume)\s+([^:\n]+?)[.!]?", value, re.I)
+    if match and len(match[1].split()) <= 3:
+        action = "continue" if value.split()[0].lower().lstrip("/") in ("continue", "resume") else "cancel"
+        target = match[1].strip()
+        identity = re.fullmatch(r"[Jj](\d+)", target)
+        return {"action": action, "target": int(identity[1]) if identity else target}
     return None
 
 
@@ -236,6 +305,7 @@ class Manager:
         self.routers = {}
         self.controls = {}
         self.cancel_sent = set()
+        self.reviewing = None
         self.closed = False
         self.recovery_pending = not recover
         if recover:
@@ -244,16 +314,23 @@ class Manager:
     async def admit(self, scope, message_id, route, text):
         event, fresh = self.store.receive(scope, message_id, route, text)
         if not fresh:
-            return event["reply"] or f"M{event['id']} is already received."
+            # Platform replays must not duplicate a routing receipt or create chatter.
+            return ""
         directive = explicit(text)
         earlier = self.store.rows("SELECT id FROM inbox WHERE scope=? AND state='pending' AND id<? LIMIT 1",
                                   (scope, event["id"]))
-        if not directive and not earlier and not self.store.jobs(scope, active=True):
-            directive = {"action": "new"}
         if directive and (not earlier or directive["action"] == "status"):
             await self.route(event, directive, notify=False)
             return self.store.rows("SELECT reply FROM inbox WHERE id=?", (event["id"],))[0]["reply"]
-        return f"Received M{event['id']}. I’m routing it; send more instructions whenever you like."
+        return ""
+
+    def targets(self, scope, target, *, active=False):
+        if type(target) is int:
+            job = self.store.get(scope, target)
+            return [job] if job and (not active or job["state"] in ACTIVE) else []
+        if isinstance(target, str):
+            return self.store.named(scope, target, active=active)
+        return []
 
     async def route(self, event, directive=None, *, notify=True):
         directive = directive or explicit(event["text"])
@@ -268,10 +345,23 @@ class Manager:
             except Exception:
                 log.exception("Manager classification failed; preserving request for explicit routing")
                 directive = {"action": "clarify", "message": "Routing is temporarily unavailable. "
-                             "Use ‘task: …’, ‘cancel J1’, ‘steer J1: …’, or ‘status’. Your message is saved."}
+                             "Use ‘task: …’, ‘cancel <title>’, ‘steer <title>: …’, or ‘status’. Your message is saved."}
         # Inference may have taken seconds; control decisions must use current job state.
         active = self.store.jobs(event["scope"], active=True)
         action = directive.get("action")
+        reference = None
+        if action == "continue":
+            matches = self.targets(event["scope"], directive.get("target"))
+            live = [job for job in matches if job["state"] in ACTIVE]
+            if len(live) == 1:
+                directive = {"action": "steer", "target": live[0]["id"], "message": event["text"]}
+                action = "steer"
+            elif not live and matches and len({job["task_key"] for job in matches}) == 1:
+                reference = matches[0]
+                action = "new"
+            else:
+                self.store.finish_message(event, "No unique task matches that title. Describe the task you mean.", notify=notify)
+                return
         if action == "new":
             if len(active) >= self.max_queued + self.max_jobs:
                 self.store.finish_message(event, "The job queue is full. Cancel a queued job or retry after one finishes.", notify=notify)
@@ -281,50 +371,51 @@ class Manager:
             refs = [int(value) for value in re.findall(r"\b[Jj](\d+)\b", event["text"])]
             if type(directive.get("target")) is int:
                 refs.append(directive["target"])
+            if reference:
+                refs.append(reference["id"])
             refs = [value for value in dict.fromkeys(refs) if self.store.get(event["scope"], value)][:3]
+            if not reference and type(directive.get("target")) is int and not explicit(event["text"]):
+                candidate = self.store.get(event["scope"], directive["target"])
+                if candidate and candidate["state"] not in ACTIVE:
+                    reference = candidate
             if refs:
                 route = json.loads(event["route"])
                 route["reference_jobs"] = refs
                 event = dict(event, route=json.dumps(route))
-            self.store.finish_message(event, "", notify=notify, create=goal or event["text"])
+            self.store.finish_message(event, "", notify=notify, create=goal or event["text"],
+                                      title=reference["title"] if reference else directive.get("title"),
+                                      task_key=reference["task_key"] if reference else None)
             return
         if action == "status":
             jobs = self.store.jobs(event["scope"])
-            reply = "\n".join(f"J{j['id']} {j['state']}: {j['goal'][:100]}" for j in jobs[:15]) or "No jobs yet."
-            pending = self.store.rows("SELECT id FROM inbox WHERE scope=? AND state='pending' AND id!=? ORDER BY id",
-                                      (event["scope"], event["id"]))
-            if pending:
-                reply += "\nRouting pending: " + ", ".join(f"M{row['id']}" for row in pending)
+            reply = "\n".join(f"{label(j)} {j['state']}: {j['goal'][:100]}" for j in jobs[:15]) or "No jobs yet."
             self.store.finish_message(event, reply, notify=notify)
             return
         if action not in ("cancel", "steer"):
             self.store.finish_message(event, directive.get("message") or
-                                      "Which job should I update? Give its J number, or say ‘task: …’.", notify=notify)
+                                      "Which task should I update? Give its title or describe it, or say ‘task: …’.", notify=notify)
             return
         target = directive.get("target")
         if target == "all" and action == "cancel":
             targets = active
         elif target is None:
             targets = active if len(active) == 1 else []
-        elif type(target) is int:
-            job = self.store.get(event["scope"], target)
-            targets = [job] if job and job["state"] in ACTIVE else []
         else:
-            targets = []
-        if not targets:
-            self.store.finish_message(event, "No unique active job matches. Use ‘status’ and give a J number.", notify=notify)
+            targets = self.targets(event["scope"], target, active=True)
+        if not targets or (len(targets) > 1 and target != "all"):
+            self.store.finish_message(event, "No unique active job matches. Use ‘status’ and describe the task you mean.", notify=notify)
             return
         # A bulk cancellation is one durable decision, not a partially repeated inbox operation.
         if len(targets) > 1:
-            reply = "Cancellation requested for " + ", ".join(f"J{j['id']}" for j in targets) + "."
+            reply = "Cancellation requested for " + ", ".join(label(j) for j in targets) + "."
             self.store.finish_message(event, reply, notify=notify,
                                       control=("cancel", [j["id"] for j in targets], ""))
         else:
             job = targets[0]
             message = directive.get("message") or event["text"]
-            reply = (f"J{job['id']} cancelled before starting." if action == "cancel" and job["state"] == "queued" else
-                     f"Cancellation requested for J{job['id']}; I’ll confirm when it stops." if action == "cancel" else
-                     f"Steering queued for J{job['id']}; it will apply at the next safe boundary.")
+            reply = (f"{label(job)} cancelled before starting." if action == "cancel" and job["state"] == "queued" else
+                     f"Cancellation requested for {label(job)}; I’ll confirm when it stops." if action == "cancel" else
+                     f"Existing session: {label(job)}. Instruction saved.")
             self.store.finish_message(event, reply, notify=notify, control=(action, job["id"], message))
 
     async def _work(self, job):
@@ -351,7 +442,25 @@ class Manager:
             await self.route(event)
         except Exception:
             log.exception("Manager routing failed for M%s", event["id"])
-            self.store.finish_message(event, "Routing failed. Your message is saved; use ‘task: …’ or a job number to retry.", notify=True)
+            self.store.finish_message(event, "Routing failed. Your message is saved; use ‘task: …’ or a task title to retry.", notify=True)
+
+    async def _review(self, job):
+        try:
+            result = await self.runtime.review(job)
+            state = "completed"
+        except asyncio.CancelledError:
+            raise
+        except Exception as exc:
+            log.exception("Manager skill review failed for J%s", job["id"])
+            state, result = "failed", type(exc).__name__
+        while True:
+            try:
+                with self.store.db() as db:
+                    db.execute("UPDATE skill_reviews SET state=?,result=? WHERE job_id=? AND state='running'",
+                               (state, result, job["id"]))
+                return
+            except sqlite3.OperationalError:
+                await asyncio.sleep(.5)
 
     async def _control(self, job):
         # Interrupts can wait for a compression commit fence. They must never run on
@@ -380,6 +489,9 @@ class Manager:
             log.exception("Manager background operation failed")
 
     async def tick(self):
+        if self.reviewing and self.reviewing.done():
+            self._settle(self.reviewing)
+            self.reviewing = None
         if time.time() - getattr(self, "last_heartbeat", 0) >= 10:
             pulse = self.store.path.parent / "manager-status.json"
             temporary = pulse.with_suffix(".tmp")
@@ -423,13 +535,28 @@ class Manager:
             if changed:
                 job["initial_steers"] = initial
                 self.running[job["id"]] = asyncio.create_task(self._work(job))
+        # Results are already durable. Review one job at a time, after foreground
+        # work and routing, so learning never holds the main chat's turn open.
+        if (self.reviewing is None and hasattr(self.runtime, "review") and not self.running and not self.routers
+                and not self.store.restarting()):
+            reviews = self.store.rows("SELECT j.* FROM jobs j JOIN skill_reviews r ON r.job_id=j.id "
+                                      "WHERE r.state='pending' ORDER BY j.id LIMIT 1")
+            if reviews:
+                job = reviews[0]
+                with self.store.db() as db:
+                    claimed = db.execute("UPDATE skill_reviews SET state='running' WHERE job_id=? AND state='pending'",
+                                         (job["id"],)).rowcount
+                if claimed:
+                    self.reviewing = asyncio.create_task(self._review(job))
         if not hasattr(self, "delivery") or self.delivery.done():
             if hasattr(self, "delivery"):
                 self._settle(self.delivery)
             self.delivery = asyncio.create_task(self.deliver())
 
     async def deliver(self):
-        for item in self.store.rows("SELECT * FROM outbox WHERE state='pending' AND next_try<=? ORDER BY id LIMIT 5", (time.time(),)):
+        for item in self.store.rows("SELECT o.* FROM outbox o WHERE o.state='pending' AND o.next_try<=? "
+                                    "AND (o.after_id IS NULL OR EXISTS(SELECT 1 FROM outbox p WHERE p.id=o.after_id AND p.state='sent')) "
+                                    "ORDER BY o.id LIMIT 5", (time.time(),)):
             try:
                 sent = await asyncio.wait_for(self.runtime.send(json.loads(item["route"]), item["text"],
                                                                 f"rh-manager-{item['id']}"), timeout=25)
@@ -469,6 +596,8 @@ class Manager:
             tasks = [*self.running.values(), *self.routers.values(), *self.controls.values()]
             if hasattr(self, "delivery"):
                 tasks.append(self.delivery)
+            if self.reviewing:
+                tasks.append(self.reviewing)
             for task in tasks:
                 task.cancel()
             if tasks:
