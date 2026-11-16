@@ -600,3 +600,12 @@ If nothing noteworthy happened, respond with [SILENT].
 ```
 
 This means you only get notified when the agent has something to report.
+
+## Work agent reporting to a restricted reviewer
+
+For an employee-facing work agent that submits structured status, blockers and
+decisions to an owner-side reviewer, use the opt-in
+[restricted agent report webhook recipe](../user-guide/messaging/webhooks.md#restricted-agent-reports).
+It includes isolated participant setup, owner-controlled receiver configuration,
+a runnable signed sender and a no-network dry run. Reports reuse webhook durable
+admission and delivery; they do not create a cross-profile chat or a new queue.

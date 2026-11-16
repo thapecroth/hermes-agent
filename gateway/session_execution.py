@@ -39,6 +39,14 @@ class GatewaySessionAgentMixin:
         reused: bool = False
         evicted: Any = None  # agent evicted under the lock; released off-lock on a daemon thread
 
+    def _report_isolation(self) -> bool:
+        from gateway.platforms.webhook import WebhookAdapter
+        source = self._ctx.source
+        if source.platform != Platform.WEBHOOK:
+            return False
+        adapter = self._runner._intake_adapter_for(source)
+        return isinstance(adapter, WebhookAdapter) and adapter.is_agent_report_source(source)
+
     def _skip_context_files(self, platform_key) -> bool:
         """gateway.platforms.<plat>.skip_context_files: messaging platforms may opt out of
         filesystem-heavy context-file discovery (SOUL.md, AGENTS.md, .cursorrules)."""
@@ -163,10 +171,15 @@ class GatewaySessionAgentMixin:
         from gateway.session_policy import policy_for_source
         from gateway.session_worker_construct import session_prefill
         policy = policy_for_source(runner, src)
-        return ctx.AIAgent(
+        report_isolation = self._report_isolation()
+        # skip_memory alone permits an explicit memory toolset to load built-in stores.
+        disabled_toolsets = ctx.disabled_toolsets
+        if report_isolation:
+            disabled_toolsets = [*(disabled_toolsets or []), "memory"]
+        agent = ctx.AIAgent(
             model=turn_route["model"], **turn_route["runtime"], **_checkpoint_agent_kwargs(ctx.user_config),
             max_iterations=max_iterations, quiet_mode=not bool(policy and policy.verbose), verbose_logging=False,
-            enabled_toolsets=ctx.enabled_toolsets, disabled_toolsets=ctx.disabled_toolsets,
+            enabled_toolsets=ctx.enabled_toolsets, disabled_toolsets=disabled_toolsets,
             ephemeral_system_prompt=combined_ephemeral or None,
             prefill_messages=(session_prefill(active_authority(runner), policy, src.chat_id) if policy
                               else runner._prefill_messages) or None,
@@ -183,15 +196,20 @@ class GatewaySessionAgentMixin:
             # Reload from disk — do not reuse the startup snapshot.
             # See #60955.
             fallback_model=None if api_runtime_locked() else self._runner._refresh_fallback_model(),
-            skip_context_files=skip_context_files,
+            skip_context_files=report_isolation or skip_context_files,
             # Keep the persona even with minimal context: soul identity is one small file.
-            load_soul_identity=not bool(policy and policy.ignore_rules),
-            skip_memory=bool(policy and policy.ignore_rules),
+            load_soul_identity=not (report_isolation or bool(policy and policy.ignore_rules)),
+            skip_memory=report_isolation or bool(policy and policy.ignore_rules),
+            skip_background_review=report_isolation,
             pass_session_id=bool(policy and policy.pass_session_id),
             # A local session's frozen budget (`--run-budget` / its profile's agent.run_budget_seconds);
             # None leaves the agent reading the owner's config, as before.
             run_budget_seconds=policy.run_budget_seconds if policy else None,
         )
+        if report_isolation:
+            # The existing Bot Chat gate has no constructor kwarg; pin it before any turn/tool rebuild.
+            agent._bot_mode_protocol = False
+        return agent
 
     def _resolve_turn_agent(self, turn_route, platform_key, combined_ephemeral, max_iterations, reasoning_config, pr):
         """Reuse this session's cached AIAgent (frozen system prompt + tool schemas → prompt cache
@@ -199,9 +217,11 @@ class GatewaySessionAgentMixin:
         ctx = self._ctx
         runner = self._runner
         skip_context_files = self._skip_context_files(platform_key)
+        cache_keys = dict(runner._extract_cache_busting_config(ctx.user_config))
+        cache_keys["agent_report_isolation"] = self._report_isolation()
         sig = runner._agent_config_signature(
             turn_route["model"], turn_route["runtime"], ctx.enabled_toolsets, combined_ephemeral,
-            cache_keys=runner._extract_cache_busting_config(ctx.user_config),
+            cache_keys=cache_keys,
             user_id=getattr(ctx.source, "user_id", None),
             user_id_alt=getattr(ctx.source, "user_id_alt", None),
             skip_context_files=skip_context_files,

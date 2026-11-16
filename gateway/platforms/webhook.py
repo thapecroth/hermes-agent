@@ -37,6 +37,7 @@ except ImportError:
 
 from gateway.config import Platform, PlatformConfig
 from gateway.platforms._shared import secrets_match, timestamp_fresh
+from gateway.platforms.agent_reports.contract import MAX_REPORT_BYTES, Receiver, Report
 from gateway.platforms.base import BasePlatformAdapter, SendResult
 from gateway.platforms.event import MessageEvent, MessageType
 from gateway.platforms.tcp_site import start_tcp_site
@@ -263,6 +264,8 @@ class WebhookAdapter(BasePlatformAdapter):
                              f"Refusing to start to prevent accidental exposure.")
         if pin_error := _signature_pin_error(name, route):
             raise ValueError(pin_error)
+        if "agent_report" in route:
+            Receiver.from_route(route, secret)
         if route.get("deliver_only"):
             deliver = route.get("deliver", "log")
             if not deliver or deliver == "log":
@@ -393,6 +396,14 @@ class WebhookAdapter(BasePlatformAdapter):
     async def get_chat_info(self, chat_id: str) -> dict[str, Any]:
         return {"name": chat_id, "type": "webhook"}
 
+    def is_agent_report_source(self, source) -> bool:
+        """Read the authenticated route identity, never report text or sender metadata."""
+        user_id = str(getattr(source, "user_id", "") or "")
+        if not user_id.startswith("webhook:"):
+            return False
+        route = self._routes.get(user_id[len("webhook:"):])
+        return isinstance(route, dict) and "agent_report" in route
+
     def toolsets_for_source(self, source) -> Optional[list[str]]:
         """Per-route ``toolsets`` override (config.yaml or a manual key in webhook_subscriptions.json —
         deliberately NOT settable via `hermes webhook subscribe`, so an agent-created subscription
@@ -403,6 +414,10 @@ class WebhookAdapter(BasePlatformAdapter):
         if not user_id.startswith("webhook:"):
             return None
         route_config = self._routes.get(user_id[len("webhook:"):])
+        if isinstance(route_config, dict) and "agent_report" in route_config:
+            # Missing or malformed grants must never inherit platform defaults.
+            toolsets = route_config.get("toolsets", [])
+            return toolsets if isinstance(toolsets, list) else []
         toolsets = route_config.get("toolsets") if isinstance(route_config, dict) else None
         if not isinstance(toolsets, list):
             return None
@@ -683,6 +698,8 @@ class WebhookAdapter(BasePlatformAdapter):
             raw_body, error_response = await self._read_authenticated_body(request, route_name, route_config)
         if error_response is not None:
             return error_response
+        if "agent_report" in route_config:
+            return await self._handle_agent_report(request, route_name, route_config, profile, raw_body)
         headers = request.headers
         delivery_id = _header_delivery_id(headers)
         # A parked profile is retried, before any delivery id is recorded. The check resolves
@@ -756,6 +773,30 @@ class WebhookAdapter(BasePlatformAdapter):
         return await self._dispatch_agent_run(request, route_config, route_name, profile, payload, prompt, event_type,
                                         delivery_id, now)
 
+    async def _handle_agent_report(self, request, route_name: str, route_config: dict, profile,
+                                   raw_body: bytes) -> web.Response:
+        """Validate before durable admission; the report ID, not an unsigned header, keys retries."""
+        try:
+            receiver = Receiver.from_route(route_config, route_config.get("secret", self._global_secret))
+        except ValueError:
+            return _json_error("Invalid agent report receiver configuration", 403)
+        now = time.time()
+        if not self._record_rate_limit_hit(route_name, now):
+            return _json_error("Rate limit exceeded", 429)
+        if len(raw_body) > MAX_REPORT_BYTES:
+            return _json_error("Report exceeds 32768 bytes", 413)
+        try:
+            report = Report.parse(raw_body)
+        except ValueError:
+            return _json_error("Invalid agent report", 400)
+        from gateway.platforms.webhook_ingress import parked_profile_refusal
+        refusal = parked_profile_refusal(self.gateway_runner, profile, route_config,
+                                        lambda: self._admission_source(route_name, profile, report.report_id))
+        if refusal is not None:
+            return refusal
+        return await self._dispatch_agent_run(request, route_config, route_name, profile, {}, receiver.render(report),
+                                              "agent_report", report.report_id, now)
+
     async def _dispatch_agent_run(self, request, route_config: dict, route_name: str, profile, payload: Any, prompt: str,
                             event_type: str, delivery_id: str, now: float) -> web.Response:
         """Acknowledge only after the authority commits the immutable delivery."""
@@ -814,7 +855,8 @@ class WebhookAdapter(BasePlatformAdapter):
         # THIS profile's adapter, home channel and secrets — not the first profile that has the platform.
         self._delivery_info[session_chat_id] = {
             "deliver": route_config.get("deliver", "log"), "profile": profile,
-            "deliver_extra": self._render_delivery_extra(route_config.get("deliver_extra", {}), payload),
+            "deliver_extra": (dict(route_config.get("deliver_extra", {})) if "agent_report" in route_config else
+                              self._render_delivery_extra(route_config.get("deliver_extra", {}), payload)),
             "route": route_name,
             "mirror": route_config.get("mirror_to_session") is True}
         self._delivery_info_created[session_chat_id] = now

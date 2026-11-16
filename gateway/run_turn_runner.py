@@ -1315,6 +1315,10 @@ class TurnRunner(GatewayTurnProgressMixin, GatewaySessionAgentMixin):
         from hermes_state_runtime import RuntimeStoreError
         policy = policy_for_source(self._runner, self._ctx.source)
         with ExitStack() as scope:
+            if self._ctx.source.platform == Platform.WEBHOOK:
+                from agent.delegation_context import non_dispatcher_owned_context
+                # Webhook turns never own a launch process's dispatcher task, including ordinary routes.
+                scope.enter_context(non_dispatcher_owned_context())
             try:
                 scope.enter_context(policy_scope(policy, authority=active_authority(self._runner)))
             except RuntimeStoreError as exc:

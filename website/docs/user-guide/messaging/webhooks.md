@@ -79,6 +79,7 @@ Routes define how different webhook sources are handled. Each route is a named e
 | Property | Required | Description |
 |----------|----------|-------------|
 | `events` | No | List of event types to accept (e.g. `["pull_request"]`). If empty, all events are accepted. Event type is read from `X-GitHub-Event`, `X-GitLab-Event`, or `event_type` in the payload. |
+| `agent_report` | No | Opt in to the [restricted agent report contract](#restricted-agent-reports), with a required owner-configured `source`. Reports require pinned HMAC, fixed delivery, and default to zero tools. Payload templates and execution transforms are disabled in this mode. |
 | `secret` | **Yes** | HMAC secret for signature validation. Falls back to the global `secret` if not set on the route. Set to `"INSECURE_NO_AUTH"` for testing only (skips validation). |
 | `signature` | No | Pin the route to one signature scheme: `generic` (`X-Webhook-Signature-V2` + `X-Webhook-Timestamp`, or Standard Webhooks / Svix headers), `github` (`X-Hub-Signature-256`), `gitlab` (`X-Gitlab-Token`, or a GitLab signing token sent as Standard Webhooks headers) or `linear` (`Linear-Signature`). Every other header family gets the same `404` as an unknown route. Omit it to accept every supported scheme (the behaviour before this key existed). `hermes webhook subscribe` writes `signature: generic` for new routes. Recommended; see [Pin the signature scheme](#pin-the-signature-scheme). |
 | `profile` | No | Profile authorized to execute this route when `gateway.multiplex_profiles` is enabled. Omit it for a default-profile-only route; set a profile name (for example `coder`) to bind the route and its secret to `/p/coder/webhooks/<route>`. Dynamic subscriptions set it with `hermes webhook subscribe <name> --route-profile coder`. |
@@ -735,3 +736,190 @@ This is the same trust model that applies to everything the agent reads: web pag
 | `WEBHOOK_ENABLED` | Enable the webhook platform adapter | `false` |
 | `WEBHOOK_PORT` | HTTP server port for receiving webhooks | `8644` |
 | `WEBHOOK_SECRET` | Global HMAC secret (used as fallback when routes don't specify their own) | _(none)_ |
+
+## Restricted agent reports
+
+An opt-in `agent_report` route accepts structured work reports from another agent
+and runs a restricted reviewer through the existing webhook admission and delivery
+pipeline. For example, a work agent chats with an employee using its own work-only
+state, then submits status, blockers and decisions for an owner's review. This is
+one-way report data, not a conversation handoff or a remote command channel.
+Existing `message_agent` / `hermes peer dm` Bot Chats and cross-profile handoffs
+serve different purposes; reports do not add another inbox, queue or messaging tool.
+Ordinary webhook routes are unchanged.
+
+### Isolate the participants first
+
+Run the work agent and reviewer as **separate whole-process containers or dedicated
+OS identities**, with separate homes, allowlists, work volumes and credentials.
+Profiles select state and routing; they are **not filesystem sandboxes or tenants**.
+Do not mount personal files, memories, auth stores or sockets into either process,
+and do not inherit the owner's environment or copy personal provider credentials.
+The work agent should persist memory only on its dedicated work volume. Configure
+the reviewer's existing model/provider pipeline with credentials provisioned for
+that reviewer. See [the security policy](https://github.com/NousResearch/hermes-agent/blob/main/SECURITY.md)
+and [memory settings](../features/memory.md).
+
+Use a dedicated reviewer home, not the owner's personal chat profile. Disable
+its built-in memory and automatic review writes, and leave external memory
+providers and unneeded plugins/hooks unconfigured:
+
+```yaml
+memory:
+  memory_enabled: false
+  user_profile_enabled: false
+auxiliary:
+  background_review:
+    enabled: false
+```
+
+Report construction enforces `skip_memory=True`, `skip_background_review=True`,
+`skip_context_files=True`, and `load_soul_identity=False`. Built-in memory tools
+are disabled even if listed in route grants; external memory providers are not
+initialized or automatically synced. Bot Chat tool injection is disabled, and
+webhook turns never inherit a dispatcher process's Kanban worker identity. These
+controls come from the authenticated adapter's route settings, not report fields.
+They exclude built-in memory, SOUL and context files from the report agent; they
+do not isolate the process, plugins, hooks, credentials or arbitrary tool access.
+
+If the owner deliberately wants work memory, use a **separate work-facing agent
+or reviewer with a dedicated isolated runtime/home** and the existing profile
+memory settings. The restricted report receiver always skips memory; a report or
+route memory tool grant cannot re-enable it. Never inherit personal memory into
+that work workflow.
+
+This route never merges reports into another agent's memory and does not mirror
+its output into an owner chat's transcript. Delivery of a summary is not owner
+acceptance. The owner's decisions belong in the owner's separate workflow.
+
+### Configure the receiver
+
+The owner manually opts in by adding a route to the reviewer's `config.yaml`.
+Provision a unique random secret per source through your deployment secret
+management (`WORK_REPORT_SECRET` below, using the existing secret expansion). Give the work agent only that route's
+URL and signing secret. Never give it the receiver configuration or delivery
+credentials. The example uses an already configured owner-facing Telegram adapter;
+`deliver: log` also works for local inspection without a messaging account.
+
+```yaml
+platforms:
+  webhook:
+    enabled: true
+    extra:
+      host: 127.0.0.1
+      port: 8644
+      routes:
+        work-reports:
+          secret: "${env:WORK_REPORT_SECRET}"
+          signature: generic
+          agent_report:
+            source: work-agent-a
+          toolsets: []
+          prompt: "Summarize progress, blockers, and decisions in three short paragraphs."
+          deliver: telegram
+          deliver_extra:
+            chat_id: OWNER_CONFIGURED_CHAT
+```
+
+Start the reviewer's gateway with `hermes gateway run`. `signature` must pin
+`generic` (timestamp-bound V2 or Standard Webhooks), `github`, or `linear` HMAC;
+`INSECURE_NO_AUTH` and bearer-token-only authentication are refused. When exposing
+the endpoint beyond loopback, provide HTTPS, network access controls and the
+usual webhook rate limits. Authentication identifies a configured source, not
+whether its report is true. Anyone holding that source's secret can submit its
+claims; use separate secrets for distinct sources.
+
+With `agent_report` present, missing `toolsets` means **zero tools**, even if
+`platform_toolsets.webhook` is broader. An explicit empty list also stays empty,
+including no automatic MCP-server merge. The owner can manually grant a specific
+list such as `[web]` for independent public evidence checks. Broader tools expand
+the trust envelope; report fields cannot grant them. Enabled terminal, file, or
+other capable tools can access filesystem state with the reviewer's process
+permissions. A profile provides no filesystem sandbox guarantee. Built-in memory
+remains disabled regardless of route tool grants. No terminal, file, private
+memory, messaging or peer tools are granted by default.
+
+The route's optional `prompt` is literal owner instruction text, never a payload
+template. `deliver` and `deliver_extra` are literal owner settings, never expanded
+from reports. The route cannot combine with `script`, `skills`, `filters`, `events`,
+`coalesce`, `cron_job`, `deliver_only`, `mcp_event`, or `mirror_to_session`. Invalid
+receiver configuration fails closed. On a multiplex gateway, the existing explicit
+route `profile` binding and `/p/<profile>/webhooks/<route>` checks still apply;
+prefer separate processes when isolating lower-trust participants.
+
+All non-secret behavior is owner-configurable in `config.yaml`: receiver `profile`,
+authenticated `agent_report.source`, literal reviewer `prompt`, `toolsets`, and
+fixed `deliver`/`deliver_extra`. The receiver profile owns the existing model,
+workspace and memory configuration; reports add no parallel model/workspace/memory
+settings and always apply the memory/context exclusions above. The payload cannot
+select any of these settings. Schedule submissions through existing Hermes cron
+jobs or webhook/event integrations on the work agent; this bridge adds no scheduler.
+
+### Submit and retry a report
+
+A runnable fixture and sender are included in the checkout. Activate the isolated
+work development environment, then validate without a secret, network, gateway,
+model API or messaging account:
+
+```bash
+just send-agent-report scripts/fixtures/agent-report.json --dry-run
+```
+
+To send, put the provisioned route signing secret in `AGENT_REPORT_SECRET` using
+your secret manager, and run:
+
+```bash
+just send-agent-report scripts/fixtures/agent-report.json \
+  --url https://reviewer.example/webhooks/work-reports
+```
+
+The sender uses the same timestamp-bound V2 signing idiom as `hermes webhook test`.
+It reads only the selected report and signing secret. It does not copy model auth
+or personal memory. The example is also runnable as
+`python scripts/send_agent_report.py ...` in a prepared Hermes environment.
+
+The JSON object has exactly these fields, all required:
+
+| Field | Contract |
+| --- | --- |
+| `version` | Integer `1` |
+| `report_id`, `task_id` | Stable IDs, 1–128 ASCII letters, digits, `_`, `.`, `-`; first character alphanumeric |
+| `timestamp` | Source-claimed ISO 8601 timestamp with seconds and timezone; not proof of freshness |
+| `status` | `planned`, `in_progress`, `blocked`, `completed`, or `cancelled`; always a source claim |
+| `summary` | Nonempty text, at most 4,096 characters |
+| `claims` | At most 20 objects with unique `id`, nonempty `text` (2,048 characters), and `evidence` |
+| `evidence` (inside each claim) | At most 5 objects with unique `id`, `reference`, `description`; text fields at most 1,024 characters |
+| `blockers`, `decisions_requested` | Each at most 20 nonempty strings of at most 2,048 characters |
+
+Claim/evidence IDs follow the same ID grammar. The entire UTF-8 JSON body must fit
+32,768 bytes. Unknown fields, duplicate JSON keys, malformed values and control
+field spoofs (including `source`, `profile`, `toolsets`, `deliver`, `verified`, or
+`owner_accepted`) are rejected before admission or inference and do not consume
+the report ID. Evidence references remain inert source-supplied references; they
+are not fetched during intake.
+
+Keep the same report bytes and `report_id` on retries. The existing durable ledger
+keys reports by profile, authenticated route and report ID; changing an HTTP
+delivery-ID header does not bypass deduplication. A successful `202` means admitted,
+not verified, accepted by the owner, or already delivered. An exact duplicate
+returns `200`. A changed report under an admitted ID conflicts (`503`); use a new
+report ID for an update to the same task. Retry transient `429`/`503` responses
+with backoff. Invalid requests receive `400`/`413`; auth failure receives the usual
+uniform `404`. The existing durable execution and delivery recovery policies apply.
+
+The reviewer input labels configured provenance, source claims, owner acceptance
+(not supplied), and verified findings (none unless independently checked). It
+preserves task/report/claim/evidence IDs and frames report text as untrusted data
+using the existing delimiter-neutralization primitive. These are prompt framing
+and tool-reduction measures, **not perfect prompt-injection immunity**. A model can
+still produce misleading summaries. Owner review and OS isolation remain necessary.
+
+The synthetic E2E contract is runnable offline in a prepared test environment:
+
+```bash
+scripts/run_tests.sh tests/gateway/agent_reports/ tests/scripts/test_send_agent_report.py
+```
+
+It exercises real signed HTTP intake, durable admission/retry, reviewer model
+requests with no tools, attribution, and fixed delivery handoff. Only inference
+and outbound transport are synthetic; no paid API or messaging account is required.

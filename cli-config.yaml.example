@@ -1559,6 +1559,23 @@ platform_toolsets:
 #       # Public HTTPS origin in front of this listener; MCP servers with
 #       # `events: true` POST event deliveries to <public_url>/webhooks/<route>.
 #       public_url: "https://hermes.example.com"
+#       # Opt-in restricted structured reports. Use a dedicated isolated reviewer runtime/home.
+#       # See user-guide/messaging/webhooks.md#restricted-agent-reports for the payload contract.
+#       routes:
+#         work-reports:
+#           profile: reviewer              # Existing route ownership under multiplexing; omit for default
+#           secret: "${env:WORK_REPORT_SECRET}"  # Dedicated source credential from the existing secret store
+#           signature: generic
+#           agent_report:
+#             source: work-agent-a         # Owner-configured authenticated label, never payload-selected
+#           prompt: "Summarize progress, blockers, and decisions."
+#           toolsets: []                  # No implicit tools/MCP; built-in memory always disabled
+#           deliver: telegram             # Fixed owner-selected output adapter
+#           deliver_extra:
+#             chat_id: OWNER_CONFIGURED_CHAT
+#       # Model/workspace stay profile-scoped; report turns skip memory, background review,
+#       # SOUL and context files. Profiles are not filesystem sandboxes for owner-granted tools.
+#       # Schedule submissions with existing cron/event integrations, not a separate scheduler.
 #
 # Discord-specific settings (config.yaml top-level, not under platforms:):
 #

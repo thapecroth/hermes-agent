@@ -237,3 +237,9 @@ migrate-branch *args:
     if python="$(git rev-parse --git-path migrate-branch/python)" && [ -f "$python" ]; then \
         PYTHONPATH="$PWD" "$(cat "$python")" scripts/move/migrate_branch.py "$@"; \
     else scripts/hermes-python -m scripts.ci.python_packages libcst==1.9.0 -- scripts/move/migrate_branch.py "$@"; fi
+
+# Validate or send a structured agent report (use --dry-run for no network)
+[group('development')]
+[positional-arguments]
+send-agent-report *args:
+    scripts/hermes-python scripts/send_agent_report.py "$@"
